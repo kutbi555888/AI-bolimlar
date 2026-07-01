@@ -1,0 +1,29 @@
+Image Classification:
+1.qushlarning turlarini aniqlash(Multilabel Classification yoki Multiclass Classification)
+2.burgutmi yoki lochin(Binary Classification)
+
+
+Object detection:
+1.ko'chalardagi daydi mushuk,itlarni aniqlash
+2.shaxsni aniqlash
+
+
+Segmentation
+1.qo'l oyoqlarni singanini segmentation qilish
+2.kechasi yuradigan hayvonlarni aniqlab segmentation qilish
+
+
+OCR
+1.mashinalarni raqamini aniqlab qoida buzganga jarima yuborish
+2.e'lonlarni ajratib olish
+
+
+Pose estimation
+1.sportdagi harakatlar
+2.ko'chadagi harakatlar
+
+
+
+Video Classification:
+1.sportdagi harakatlar
+2.kamerada odatdagi bo'lmagan,noodatiy harakatlar

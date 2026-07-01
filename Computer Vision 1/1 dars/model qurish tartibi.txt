@@ -1,0 +1,31 @@
+Image Classification modelini 0 dan product qilishgacha bo‘lgan asosiy tartib:
+1. Muammoni aniqlash
+2. Classlarni belgilash
+3. Dataset yig‘ish
+4. Datasetni class papkalarga ajratish
+5. Datasetni tekshirish
+6. Buzilgan rasmlarni olib tashlash
+7. Train, validation, testga ajratish
+8. Preprocessing qilish
+9. Data augmentation qo‘shish
+10. DataLoader tayyorlash
+11. Model tanlash
+12. CNN yoki pretrained model qurish
+13. Loss function tanlash
+14. Optimizer tanlash
+15. Learning rate belgilash
+16. Modelni train qilish
+17. Validation natijasini kuzatish
+18. Eng yaxshi modelni saqlash
+19. Test datasetda baholash
+20. Xatolarni tahlil qilish
+21. Modelni yaxshilash
+22. Inference pipeline tayyorlash
+23. Modelni API qilish
+24. Frontend yoki interface qilish
+25. Deployment qilish
+26. Product testing qilish
+27. Monitoring qilish
+28. Feedback yig‘ish
+29. Modelni qayta train qilish
+30. Productni doimiy yaxshilab borish
