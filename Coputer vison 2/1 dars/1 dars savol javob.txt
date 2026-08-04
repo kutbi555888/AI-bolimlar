@@ -1,0 +1,46 @@
+1. OCR va CV'ning farqi nima?
+ Ocr bu CVning bir bo'limidir
+CV esa bu katta bir AIning bo'limidir
+
+2.CTC loss nima uchun ishlatiladi?
+ CTC bu — ketma-ket belgilarni aniq pozitsiyasiz tanib olish usuli. Misol: RNN chiqishi "HHHeeelllloooo" → CTC → "Hello". Bu usul matn segmentatsiyasini osonlashtiradi.
+
+3.  PSM 6 va PSM 7 farqi?
+  PSM 6 bir blokni matn sifatida chiqaradi
+PSM 7 bitta qator sifatida chiqaradi
+
+4.PaddleOCR va TrOCR'ni solishtiring
+
+ PaddleOCR Baidu kompaniyasiniki
+80 + tilni tanib matn ko'rinishida chiqarib beradi
+tez va aniq(DB + CRNN)
+Ko'p qatorli bosma matnlarni yaxshi aniqlaydi
+bepul,open source
+aniqligi 97% + (benchmark) 
+
+from paddleocr import PaddleOCR
+ocr = PaddleOCR(use_angle_cls=True)
+result = ocr.ocr('img.jpg')
+
+------------------------------------------------------
+
+TrOCR Microsoft kompaniyasiniki
+Transformer asosida (ViT + GPT-2)
+Qo'l yozuvini yaxshi taniydi — ICR
+HuggingFace integratsiyasi bor
+Ko'proq GPU kerak
+Handwritten: 95%+ aniqlik
+
+from transformers import TrOCRProcessor
+processor = TrOCRProcessor.from_pretrained
+  ('microsoft/trocr-base-handwritten')
+
+
+5. OCR ga xayotda qanday Project qilishimiz mumkin?
+
+Bankda: Chek, qarz hujjatlari
+Tibbiyot: shifokor yozuvlari
+Ta'lim: Kitoblarni raqamlashtirish
+Davlat: Hujjatlarni arxivlash
+Savdo: Chek & shtrix-kod
+Transport: Davlat raqamini tanish
