@@ -1,0 +1,30 @@
+OCR bu rasmdagi matnlarni yoki skaner qilingan hujjatlarni avtomatik tanib kompyuterga text,raqam ko'rinishida chiqarib beradigan CVning bir bo'limidir
+OCR turlari:
+1.Printed text OCR
+matnlarni print qiladi
+
+2.HTR/HWR
+Qo'lda yozilgan matn,raqamlarni tanib komputerga chiqarib beradi
+
+3.Scene Test OCR
+tabiiy rasmlardagi matnni chiqarib beradi
+
+4.Document Layout OCR
+hujjatlardagi matnni chiqarib beradi
+
+5.Multilingual OCR
+Ko'p tilladagi matnlarni tanib kompyuterga matn,raqam ko'rinishida chiqarib berish
+
+6.End to end OCR 
+ ko'p imkoniyatlar jamlangan OCR.
+detect qiladi,recognition qiladi,layout qiladi
+
+---------------------------------------------------------------------------------------------------------------------
+
+CRNN arxitekturasi
+
+CRNN = CNN (konvolusion neural network) + RNN (recurrent neural network) + CTC (Connectionist Temporal Classification) — bu OCR uchun eng keng tarqalgan arxitektura
+
+
+input image + conv layers + feature map + sequence frames + Bi Lstm layers + CTC decoder + Text output
+
