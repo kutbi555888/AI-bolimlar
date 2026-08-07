@@ -1,0 +1,22 @@
+Preprocessing nima uchun kerak? Raqamlar bilan
+• Otsu vs Adaptive threshold — qachon qaysi?
+• EAST, DB, CRAFT — arxitektura va farqlar
+• Text Detection vs Text Recognition
+
+
+1. preprocessing biz fine tuning qilmoqchi bo'lgan modelimizni aniqligini oshirishda,tezligini oshirishda,xatosini kamaytirishda juda katta rol o'ynaydi.
+
+2. threshold bu chegara belgilashdir.ya'ni modelga mana shu qiymat chiqsa ishonman deyish
+Otsu threshold - o'zi avtomatik T(eng yaxshi) qiymatni topadi. Global thresholdda esa threshold qo'lda beriladi
+
+Adaptive Threshold - rasmning turli hududlari bo"yicha,turli piksellari bo'yicha alohida threshold topadi.maslan rasmning oqroq joylariga alohida threshold, qoraroq joylariga alohida threshold.
+Global threshold esa butun rasmga bitta threshold
+
+3. EAST, DB, CRAFT, Tesseract bular Text Detection algoritmlaridir.
+EAST - scene textlarni yaxshi topadi, real timeda yaxshi ishlaydi
+Db - murakkab va qiyshiq matnlarda kuchli ishlayd
+CRAFT - har bir harfni alohida hudud sifatida topadi
+
+
+4. Text Detection bu rasmdagi text bor hududni x,y o'qi asosida bounding box qilib topadi
+Text Recognition shu topilgan hududdagi textni nima textligini,nima yozilganini o'qiydi

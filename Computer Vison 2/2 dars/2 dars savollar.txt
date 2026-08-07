@@ -1,0 +1,31 @@
+Binarizatsiya nima? Otsu va Adaptive threshold farqi?
+Deskewing qanday ishlaydi? Hough Transform izohlang.
+EAST va DB detection arxitekturasini solishtiring.
+Erosion va Dilation qachon ishlatiladi?
+Text Detection va Text Recognition — farq nima?
+
+--------------------------------------------------------------------------------
+
+1. Binarizatsiya bu grayscale(oq qora,kulrang) rasmni faqat 2ta qiymatga (0 yoki 255ga) aylantirish
+
+Otsu threshold - o'zi avtomatik T(eng yaxshi) qiymatni topadi. Global thresholdda esa threshold qo'lda beriladi
+
+Adaptive Threshold - rasmning turli hududlari bo"yicha,turli piksellari bo'yicha alohida threshold topadi.maslan rasmning oqroq joylariga alohida threshold, qoraroq joylariga alohida threshold.
+Global threshold esa butun rasmga bitta threshold
+
+-------------------------------------------------------------------------------------
+
+2. Deskewing bu qiyshaygan hujjatni yoki matnni burchagini topib tekislash,to'grilash jarayonidir.
+
+Hough Transform — rasm ichidagi geometrik shakllarni, ayniqsa to‘g‘ri chiziqlarni aniqlash algoritmi. barcha gorizontal matn chiziqlarini burchagini topadi va eng ko'p uchraydigan burchak hujjatning qiyshiq burchagi bo'ladi.
+
+----------------------------------------------------------------------------------------------------
+
+3. Erosion matndagi harflar,raqamlar bir biriga yopishib ketganda harflarni orasini ochib model aniq o'qiydigan qilish uchun ishlatiladi. Erosion yopishib ketgan harflarni ingichkalashtirib beradi
+
+Dilation matndagi harflar bir biridan uzilib qolganda harflarni bir birini orasini boglash uchun ishlatiladi. Dilation uzilib qolgan harflarni qalinlashtirib harflarni bir biriga boglab beradi.
+
+----------------------------------------------------------------------------------------
+
+4. Text Detection bu rasmdagi text bor hududni x,y o'qi asosida bounding box qilib topadi
+Text Recognition shu topilgan hududdagi textni nima textligini,nima yozilganini o'qiydi
