@@ -1,0 +1,77 @@
+1. EasyOCR `readtext()` funktsiyasi nima qaytaradi? 3 ta element nimalardan iborat?
+2. Otsu binarizatsiyasi nima uchun Global dan yaxshiroq?
+3. Deskewing nima va u OCR ga qanday ta'sir qiladi?
+4. `reader = easyocr.Reader(['en', 'ru'])` da `['en', 'ru']` nima uchun kerak?
+5. Post-processing (regex) nima uchun kerak? Bitta real misol keltiring.
+
+---------------------------------------------------------------------------------------------------
+
+1. EasyOCR `readtext()` funksiyasi rasmdagi yoki pdfdagi matnni o'qish vazifasini bajaradi.
+
+3ta element bu:
+1.Matnni chiqarib berishi(ya'ni rasmda nima yozilgan bolsa shuni chiqarib berishi)
+2.confidence score(shu matnni necha foyiz aniqlik bilan chiqarib berishi)
+3.Bounding Box(shu chiqargan matnlarini to'rtburchak ramkaga olishi)
+
+------------------------------------------------------------------------------------------------------
+
+2. Binarizatsiya 2 lantirish.yoki 0 yoki bir.yoki oq yoki qora
+tasvirni 2ta qiymatga ajratish.0 qoraga 255 esa oqga
+yani matnni fondan ajratadi.misol uchun matn qora fon oq boladi
+
+Threshold bu piksellarga chegara qo'yib yoki qora yoki oqga aylantirish
+
+Global Thresholdda chegara qo'lda manual beriladi. shu bergan chegara qiymatga qarab matn fon qora oqga ajraladi
+
+Otsu Thresholdda esa eng yaxshi chegara avtomatik topiladi.Otsu Threshold oq fonda eng yaxshi chegara qaysi qora matnda eng yaxshi chegara qaysi yani ikkalasi uchun ham tasvirdagi piksel qiymatlarining eng ko'p uchrashiga qarab eng yaxshi bolgan chegarani avtomatik topadi
+
+Otsuda Globalga qaraganda chegara qo'lda berilmaydi,avtomatik o'zi eng yaxshi chegarani qora uchun ham oq uchun ham topadi.
+shuning uchun ham Otsu Globalga qaragand yaxshiroq 
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Deskewing bu qiyshiq bo'lgan hujjatni yoki matnni ularning burchagini aniqlab to'g'rilash jarayonidir.
+Deskewing faqat deskewing emas uning  kop bosqichlari bo'lgani uchun ham pretrained modelga juda katta foydasi bor
+bosqichlari:
+1.
+Grayscale.
+2.
+Binary.
+3.
+Hough Transform.
+4.
+Angle Calculation.
+5.
+Affine Transform.
+
+Deskewingni OCR modelga foydalari:
+Agarda hujjat yoki matn qiyshiq bo'ladigan bo'ladigan bo'lsa model bu hujjat yoki rasmdagi matnlarni xato topib yuborishi,matnlarning qatorlarini ketma ketligini tartib bilan emas chalkashtirib berishi mumkin.Deskewing qilinsa shu qatorlar tartib bilan berilishi mumkin.yana OCR model harf va so'zlarni aniq ajratadi.deskewing qilinsa undan keying bosqichlarga ham(Text detection,Text Recognition) katta yordami tegib bu bosqichlar oson togri ishlashini taminlaydi. keyin yana rasm yoki hujjat qiyshiq bolsa OCR model xato qilish ehtimoli yuqori.deskewing shu model xatolarini kamaytirib beradi.
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+4.  `reader = easyocr.Reader(['en', 'ru'])` da `['en', 'ru']` matnda inglizcha yoki ruscha so'zlar bolsa biz OCR modelga bu matn inglizcha va ruscha sozlardan tashkil topgan deb modelga yordam berishimizdir.matnda qaysi tildagi so'zlar bo'lsa shu tillar yozib qoyiladi
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+5. Post-processing (regex) nima uchun kerak? Bitta real misol keltiring.
+
+Post-processing bu model matnni oqigandan keyin,output jarayoni bolgandan keyin modelni xatolarini korib tekshirib tahlil qilib uni tuzatish jarayonidir.
+
+Regex extraction - matnni ichidan ma’lum pattern,shakl,formatga mos ma’lumotlarni topish,belgilar ketma ketligini qidirish qoidasi, va tuzilmali ma'lumotlarni ajratishdir.misol uchun Sana, telefon, ID raqam, summa kabilarni izlash topish va ajratish
+
+Regex extection kerakli ma'lumotlarni ajratib beradi. misol uchun:
+sana: 2026.05.12
+telefon: 01012345678
+id raqam: 123456789
+summa: 1mln sum
+kabi kerakli ma'lumotlarni ajratib beradi
+
+Post- Processing:
+Spell checking- imlo xatolarni tuzatadi
+regex extraction - matndan ma'lum shaklga,formatga mos kerakli ma'lumotlarni ajratadi
+NLP/NER
+NLP — Natural Language Processing, ya’ni tabiiy tilni qayta ishlash.
+NER — Named Entity Recognition, ya’ni matndan ism, joy, sana, tashkilot kabi nomlangan obyektlarni aniqlaydi.
+Layout Analysis - matnni qismlarga boladi(sarlavha,asosiy matn,jadval,grafik,matnning pastki qsmi kabi)
+
+bularning barchasi OCR modelga katta yordam beradi
+
+

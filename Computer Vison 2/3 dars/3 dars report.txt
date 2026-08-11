@@ -1,0 +1,25 @@
+Preprocessing - modelga kiritiladigan inputni trainingdan oldin modelga yordam bo'lishi uchun,model yaxshiroq o'rganishi uchun datani yaxshiroq shaklga keltirish
+Grayscale conversion - rangli piksellarni oq qora,kulrangga aylantitirish
+binarization - piksellarni chegara qo'yib oq yoki qora ga aylantirish
+noise removal - keraksiz nuqtalarni olib tashlash,rasmdagi matnga tegishli bo‘lmagan tasodifiy piksel, nuqta yoki vizual buzilishni olib tashlaydi. Noise OCR uchun zararlidir, chunki model kichik shovqin nuqtalarini
+nuqta, vergul, harf qismi deb noto‘g‘ri qabul qilishi mumkin.
+deskewing - qiyshiq hujjatni,matnni to'g'rilash
+Morphological operations — harflar shaklini yaxshilash(harflarni bir biriga yopishtirish,boglash/ajratish)
+Text Detection - textni bounding box orqali aniqlash
+Text Recognition - bounding box ichidagi matnni nima matn ekanligini oqish
+
+pretrained modellar - Easy Ocr,Paddle ocr,Tesseract,TrOcr,google vison,aws textract
+
+nega pretrained model ishlatiladi?
+chunki biz ishlatadigan bu pretrained modellarga kompaniyalar juda kop mablag,gpu,va boshqa resurslarni sarflagan.juda kop datalarni yigib train qilgan.biz ozimiz 0dan from scratch qilib model yasamoqchi bolsak bizda  katta mablag,kop data,kop vaqt kerak boladi.pretrained modellar biz shu kop vaqt,mablaglarni sarflamasdan ozimizni qilmoqchi bolgan ishga ozgina data bilan pretrained modelni fine tuning(moslashtirib,rivojlantirib,orgatib) qilib ishimizni amalga oshirish uchun kerak boladi
+
+use as is - modelni fine tuning qilmasdan oson,datalarni,pdf hujjatlarni oqish uchun ishlatish.qanday bolsa shundayligicha ishlatish
+fine tune - modelni ozroq data bilan ishimizga moslashtirish,rivojlantirish.misol uchun handwritingga ishlatish
+
+Custom Pipeline — OCR vazifasi uchun tayyor bitta tizimni to‘liq ishlatish o‘rniga, kerakli bosqichlarni alohida ozimiz tanlab, ularni o‘zaro birlashtirib qurilgan maxsus OCR jarayoni
+Custom OCR Pipeline — ma’lum bir OCR loyihasi uchun preprocessing, text detection, text recognition va post-processing bosqichlarini kerakli model va algoritmlar bilan maxsus birlashtirib qurilgan tizim.
+Custom = maxsus, o‘ziga moslashtirilgan
+Pipeline = ketma-ket ishlaydigan bosqichlar
+maxsus oziga xos sohalarga
+
+train from scratch - 0dan boshlab model yasash. umuman yangi tillarga ishlatish
