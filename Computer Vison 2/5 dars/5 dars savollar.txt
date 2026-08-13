@@ -1,0 +1,27 @@
+5 dars savollar
+1.Cer va Wer orasidagi farq nima
+2.TrOcr nima uchun Handwriting uchun yaxshiroq
+3.Layout analysis nima uchun Ocrdan oldin qilinadi
+4.Spell chek Ocr aniqligini qanday oshiradi
+
+
+1. CER - Character error rate 
+Bu har bir harfni korib chiqib har bir harfning xatosini korsatadi
+Wer dan kora aniq hisoblashi mumkin
+
+WER - Word error rate
+Bu har bir so'zni korib chiqib har bir so'zning xatosini korsatadi
+Cer dan kora noaniqroq hisoblashi mumkin
+
+
+2. TrOcr ozi aslida koproq qolda yozilgan yozuvlarni yaxshi aniqlaydigan modeldir.yani bu model qolda yozilgan yozuvlarni aniqlashga moslashtirilgan,orgatilgan.lekin print matnlarni ham yaxshi aniqlaydi
+
+Bu modelning ishlashi input kiradi - imagelarni patch split qiladi - ViT encoder yani soz,harflarni raqamga aylantiradi - Transformer decoder yani endi raqamga aylangan matnni yana oz holiga qaytarib harf,soz holatiga keltiradi - output text rasmdagi qolda yozilgan matnni text qilib kompyuterga chiqaradi
+
+
+3.Layout analysis bu matnni qismlarga bolib Ocr modelga yordam berishdir.yani biz matnni qismlarga bolib bu qism mana shu,bu qism mana shu deb aytib qoyishimizdir.shunda model bu qismlarni nimaligini aniqlashga vaqt sarflab otirmaydi.model matnga qaraganda matnni qismlari nimalardan tashkil topganligini biladi.endi model bu qismlarni ichida qanday shakldagi matn,rasm,column,grafik kabi narsalar borligiga e'tibor qaratadi
+
+
+4.Spell checking bu imlo xatolarni yoki tushib qolgan harf,soz,belgilarni aniqlab shuni avtomatik togrilashdir.
+Yoki biz ozimiz ham dictionary funksiya qolda yozib modelga buni korsang bunday oqi deb aytishimiz ham mumkin.
+masalan model Salomni Sa1om deb oqib qoygan bolishi mumkin.model shunday qilib bitta output chiqarib kop xatolar qildi.endi biz modelga qilgan xatolarini aytamiz,korsatamiz,ogohlantiramiz.misol uchun shu harf kelsa buni bu belgi yoki raqam deb chiqarma deb funksiya yozib yoki boshqa shaklda ogohlantiramiz.shundan keyin model keyingi safar korsa xato oqimaydi.

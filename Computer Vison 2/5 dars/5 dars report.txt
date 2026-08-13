@@ -1,0 +1,23 @@
+5 dars report
+1.Darsda otilgan 3ta yangi tushuncha
+
+1.Printed ocr va Handwriting ocr
+Printed ocr - bunda model print hujjatlarni,pdf,scan kabi standard hujjatlarni oqishi osonroq
+Handwriting ocr - bunda esa harflar,yozuvlar qolda yozilgani uchun harflar,yozuvlar standart emas,balki qiyshiq,bir biriga yopishga,ajralgan kabi holatlarda bolgani sababli model bu qolda yozillgan yozuvlarni oqishi qiyinroq.Handwritingni aniqlashda eng yaxshi modellardan biri bu TrOcr
+
+2.Layout Analysis
+Bu tushuncha matnni Preprocessingdan keyin trainingdan oldin qismlarga bolib chiqishni bildiradi.bular Header/title- sarlavha, Footer - sahifa pastidagi ma'lumot, Paragraph - matnning asosiy qismi, figure/image,table,column
+
+3. Post processing
+Ocr oqib bolgandan keyin natijalarni korib,tahlil qilib,tekshirib ularni tuzatish
+Bularga misol:
+Spell checking - imlo xatolarni tuzatish
+Regex extraction - matndan muhim,kerakli malumotlarni sana,telefon,email kabilarni ajratish
+Confidence filter - ishonch darajasi past bolgan sozlarni olib tashlash
+Bundan tashqari yana bosqichlari bor
+
+
+2. Preprocessing va Post- processingni farqi
+Preprocessing - bu datani modelni train qilishdan oldan model yaxshiroq organishi uchun datani yaxshiroq shaklga keltirish.
+
+Post - processing esa Ocr model oqib bolgandan keyin,output natijani chiqargandan keyin natijalarni korib,tahlil qilib,tekshirib ularni avtomatik va manual tuzatish

@@ -1,0 +1,11 @@
+OCR arxitekturasi 
+
+Input data  》 Preprocessing 》Layout Analysis 》OCR Engine(Ocr modellar) 》Output   》Post processing 》Output /storage
+
+1.Input data beriladi
+2.Preprocessing qiladi bergan datani
+3.Layout Analysis matnni qismlarga boladi
+4.Ocr model inputni,matnni oqiydi
+5.Ocr model oqib bolgandan keyin,oqigan matnini chiqaradi
+6. Post processing jarayoni bolib xatolar tekshirilib tuzatiladi
+7.matn kompyuterga chiqariladi va Data basega saqlanadi va json yoki pdf formatda korsatiladi
