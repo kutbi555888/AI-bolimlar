@@ -1,0 +1,185 @@
+1. `deskew()` funksiyasi nima uchun kerak va qanday ishlaydi?
+2. Nima uchun 5 ta preprocessing versiyasini ishlatamiz, bitta emas?
+3. `SequenceMatcher` orqali fuzzy matching qanday ishlaydi? 0.75 chegara nima ma'no beradi?
+4. `run_ocr_multi` da `best_texts` dict nima uchun ishlatilmoqda?
+5. Haqiqiy aeroport tizimida barcode/QR kod skanerlash qanday farq qiladi?
+
+---------------------------------------------------------------------------------------------------------------------------
+
+1.deskew() funksiyasi qiyshiq rasmlar bolsa ularni avtomatik togrilash uchun kerak 
+funksiya uning taxminiy burilish burchagini topadi va teskari tomonga aylantirib togri holatga keltirishga harakat qiladi
+
+
+def deskew(gray):
+    """Qiyshiq rasmni tekislaydi (burish burchagini topib, tuzatadi)"""
+    coords = np.column_stack(np.where(gray < 128))
+    if len(coords) < 10:
+        return gray
+    angle = cv2.minAreaRect(coords)[-1]
+    if angle < -45:
+        angle = -(90 + angle)
+    else:
+        angle = -angle
+    if abs(angle) < 0.5:   # 0.5 gradusdan kam qiyiqlikni o'tkazib yuborish
+        return gray
+    h, w = gray.shape
+    M = cv2.getRotationMatrix2D((w / 2, h / 2), angle, 1.0)
+    return cv2.warpAffine(gray, M, (w, h),
+                          flags=cv2.INTER_CUBIC,
+                          borderMode=cv2.BORDER_REPLICATE)
+
+print('✅ deskew() tayyor!')
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+
+2. chunki kiritilgan input data turli xil shaklda,turli holatda kamchiliklari,muammolari bo'lshi mumkin.biz shu kamchilikning,muammoning turiga qarab shu kamchilikka,muammoga mos preprocessing usullarini qo'llaymiz.ya'ni kamchilik,muammo ko'p shunga mos kamchilikni,muammoni tuzatadigan preprocessing usullari ham ko'p.
+
+Masalan bitta rasm:
+
+xira bo‘lishi mumkin,
+boshqa biri qorong‘i,
+yana biri noise bilan,
+yana biri qiyshiq,
+yana biri soyali.
+
+agar biz bu muammolarga 1ta preprocessing usulini qollasak bitta muammoni hal qiladi,lekin qolgan muammolar qoladi.shuning uchun rasm muammosi,kamchiligi ko'p bolgani uchun turli xil preprocessing usullarini qo'llaymiz
+
+
+
+
+def preprocess_advanced(image):
+    """Bir nechta preprocessing versiyasini qaytaradi: original, clahe, otsu, adaptive, morph"""
+    img_np  = np.array(image)
+    img_bgr = cv2.cvtColor(img_np, cv2.COLOR_RGB2BGR)
+
+    # Kichik rasmlarni kattalashtirish (OCR uchun min 1000px)
+    h, w = img_bgr.shape[:2]
+    if max(h, w) < 1000:
+        scale   = 1000 / max(h, w)
+        img_bgr = cv2.resize(img_bgr, None, fx=scale, fy=scale,
+                             interpolation=cv2.INTER_CUBIC)
+
+    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
+    gray = deskew(gray)
+
+    # Versiya 1: CLAHE — kontrast oshirish
+    clahe    = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+    v1_clahe = clahe.apply(gray)
+
+    # Versiya 2: Gaussian blur + Otsu threshold
+    blurred  = cv2.GaussianBlur(gray, (3, 3), 0)
+    _, v2_otsu = cv2.threshold(blurred, 0, 255,
+                                cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    # Versiya 3: Adaptive threshold — notekis yoritilgan ticketlar uchun
+    v3_adaptive = cv2.adaptiveThreshold(
+        gray, 255,
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY, 31, 10
+    )
+
+    # Versiya 4: Morph — shovqin yo'qotish
+    kernel   = cv2.getStructuringElement(cv2.MORPH_RECT, (2, 2))
+    v4_morph = cv2.morphologyEx(v2_otsu, cv2.MORPH_OPEN, kernel)
+
+    return img_bgr, v1_clahe, v2_otsu, v3_adaptive, v4_morph
+
+print('✅ preprocess_advanced() tayyor!')
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+3. `SequenceMatcher` orqali fuzzy matching qanday ishlaydi? 0.75 chegara nima ma'no beradi?
+
+SequenceMatcher orqali fuzzy matching — ikki matn aynan bir xil bo‘lmasa ham, qanchalik o‘xshashligini hisoblash usulidir.
+SequenceMatcher bu yerda OCR noto‘g‘ri o‘qigan ismni database dagi haqiqiy ismga o‘xshashligi orqali topish uchun ishlatilmoqda.
+
+
+0.75 nima?
+bu qator:
+if best_score >= 0.75:
+
+bu degani eng yaxshi topilgan ism database dagi ismga kamida 75% o‘xshasa, uni mos yo‘lovchi deb qabul qil bolmasa qabul qilma degani.
+
+
+
+def find_passenger(info):
+    """OCR ma'lumotlari asosida yo'lovchini bazada qidiradi."""
+    flight = info['flight'].upper().replace(' ', '')
+    name   = info['name'].upper()
+    seat   = info['seat'].upper()
+
+    # 1-usul: Ism + flight bo'yicha aniq moslik
+    if name != 'NOT FOUND' and flight != 'NOT FOUND':
+        mask = (
+            (df_passengers['flight'].str.upper() == flight) &
+            (df_passengers['name'].str.upper()   == name)
+        )
+        if mask.any():
+            return df_passengers[mask].iloc[0], 'exact_name'
+
+    # 2-usul: Fuzzy name matching (OCR xatolarini hisobga olish)
+    if name != 'NOT FOUND':
+        best_score, best_row = 0, None
+        for _, row in df_passengers.iterrows():
+            if flight != 'NOT FOUND' and row['flight'].upper() != flight:
+                continue
+            score = name_similarity(name, row['name'])
+            if score > best_score:
+                best_score, best_row = score, row
+        if best_score >= 0.75:   # 75% o'xshashlik yetarli
+            return best_row, 'fuzzy_name'
+
+    # 3-usul: O'rindiq + flight bo'yicha
+    if seat != 'NOT FOUND' and flight != 'NOT FOUND':
+        mask = (
+            (df_passengers['flight'].str.upper() == flight) &
+            (df_passengers['seat'].str.upper()   == seat)
+        )
+        if mask.any():
+            return df_passengers[mask].iloc[0], 'seat_flight'
+
+    return None, 'not_found'
+
+print('✅ find_passenger() tayyor!')
+
+
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+4. `run_ocr_multi` da `best_texts` dict nima uchun ishlatilmoqda?
+
+
+best_texts — 5 xil preprocessing versiyasidan bir xil OCR text bir necha marta topilganda, ularni duplicate sifatida birlashtirib, shu textning eng yuqori confidence’li (bbox, text, conf) natijasini saqlash uchun ishlatiladigan dictionary.
+
+
+def run_ocr_multi(img_bgr, v1_clahe, v2_otsu, v3_adaptive, v4_morph, conf_threshold=0.15):
+    """Barcha 5 preprocessing versiyasida OCR ishlatadi, eng yaxshi natijani saqlaydi."""
+    sources = [img_bgr, v1_clahe, v2_otsu, v3_adaptive, v4_morph]
+
+    best_texts = {}  # key=normalized_text, value=(bbox, text, conf)
+
+    for src in sources:
+        results = reader.readtext(src, detail=1)
+        for (bbox, text, conf) in results:
+            if conf < conf_threshold:
+                continue
+            # Normalizatsiya: katta harf, bo'shliqsiz
+            key = re.sub(r'\s+', '', text.upper())
+            if key not in best_texts or best_texts[key][2] < conf:
+                best_texts[key] = (bbox, text, conf)
+
+    # y, x tartibida saralash (yuqoridan pastga, chapdan o'ngga)
+    merged = list(best_texts.values())
+    merged.sort(key=lambda x: (x[0][0][1], x[0][0][0]))
+    return merged
+
+print('✅ run_ocr_multi() tayyor!')
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+5. Haqiqiy aeroport tizimida barcode/QR kod skanerlash qanday farq qiladi?
+
+Haqiqiy aeroport tizimida barcode/QR skanerlash OCRdan ancha farq qiladi. OCR ko‘rinib turgan yozuvni “o‘qishga” harakat qiladi, barcode yoki QR skaner esa kod ichiga oldindan raqamli formatda kodlangan ma’lumotni dekodlaydi.
