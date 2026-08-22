@@ -1,0 +1,69 @@
+1. Semantic -sem va Instance -seg modellarining suffix farqi nima?​
+
+2. Cityscapes da nechta class bor va 255 piksel qiymati nimani anglatadi?​
+
+3. mAPbox va mAPmask orasidagi farqni tushuntiring.​
+
+4. Panoptic Quality (PQ) formulasini yozing va SQ, RQ ni izohlang.​
+
+5. YOLO26n-sem va YOLO26x-sem orasida speed vs accuracy tradeoff ni tahlil
+qiling.​
+
+-------------------------------------------------------------------------------------------------------------------------------
+
+1. Ultralytics YOLO26’da -sem Semantic Segmentation, -seg esa Instance Segmentation modelini bildiradi.
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+2. Cityscapesda 19 ta class bor
+
+255 bu ignore label degan ma’noni beradi.Ultralytics Cityscapes mappingida ignored yoki void labellar 255 ga aylantiriladi va ular loss hamda evaluation hisobidan chiqariladi.
+Model   pixel = 255 bo‘lgan joy uchun:
+Prediction to‘g‘rimi?
+Prediction noto‘g‘rimi? deb baholamaydi.
+classlar 0 dan 18gacha bo‘lgani uchun 255ni maxsus IGNORE qiymati sifatida ishlatish juda qulay.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+3. mAP_box- bu modelning bounding boxlarini qanchalik to'g'ri topganini olchaydi.Yanayam aniqrogi obyektning joylashuvi va bounding box aniqligi
+mAP_mask - esa modelning Segmentation masklari qanchalik togri ekanini olchaydi.Yanayam aniqrogi obyektning aniq shakli,maski qanchalik to‘g‘ri segment qilinganini o‘lchaydi.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+4. PQ = Panoptic Quality(sifati) degani.
+Bu Panoptic Segmentation modelini baholash uchun ishlatiladigan asosiy metric.
+PQ metrigi model obyektni to‘g‘ri topdimi va uning maskini qanchalik aniq chizdi — ikkalasini birga o‘lchaydi.
+PQ ikki qismdan iborat:
+PQ=SQ × RQ
+Bu yerda:
+SQ = Segmentation Quality
+→ topilgan segmentlarning maski qanchalik aniq shuni olchaydi
+RQ = Recognition Quality
+→ segmentlar to‘g‘ri topildimi, keraksizlari ko‘pmi, ba’zilari o‘tkazib yuborildimi degani
+SQ = mask qanchalik aniq?
+RQ = obyektlar qanchalik to‘g‘ri topildi?
+
+Misol uchun:
+Rasmda aslida 5 ta obyekt bor. Model 4 tasini to‘g‘ri topdi va ularning masklari ham yaxshi chiqdi.
+Shunda:
+Recognition yaxshi + Mask quality yaxshi = PQ yuqori
+Agar model obyektlarni topsa-yu, masklar noto‘g‘ri bo‘lsa:
+RQ yuqori
+SQ past boladi
+→ PQ pasayadi
+Agar masklar yaxshi bo‘lsa-yu, ko‘p obyektni topolmasa:
+SQ yuqori
+RQ past boladi
+→ PQ pasayadi
+Shuning uchun PQ juda foydali metricdir.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+5. n = nano
+x = extra-large
+YOLO26n-sem juda kichik model
+YOLO26x-sem juda katta model
+Ikkalasi ham: Semantic Segmentation
+Farqi:
+n  tezroq, yengilroq, accuracy biroz pastroq
+x  sekinroq, og‘irroq, accuracy yuqoriroq

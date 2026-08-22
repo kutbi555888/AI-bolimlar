@@ -1,0 +1,139 @@
+8 dars report
+
+Yolo 26 kop kasbni biladigan odamga oxshaydi. Classification, Detection, Segmentation, Pose Estimation hammasi ichida
+
+Semantic Segmentation 
+Har bir pixelga,pixellar toplamiga classga nom beradi.qaysidir classning bir xil obyectlarini ajratmaydi.
+Chiqishi : Class mapping
+Chiqish olchami H×With
+Model faylida -sem.pt korinishida
+Kirish olchami   imgsz=1024
+Baholash metrigi  -  mIoU
+Bencark Dataseti  - PASCAL VOC, Sityscapes
+Semanticda Instance mask va bounding box yoq
+
+
+Instance Segmentation 
+Har bir obyektni alohida mask va noyob ID bilan aniqlaydi. Bir xil classdagi turli obyektlarni ajratadi.
+Chiqish olchami  N×H×W (N bu n ta instance mask)
+Chiqishi: bbox + class + confidence + polygon mask.
+Model faylida   -seg.pt
+Metrigi  -  mAP_mask va mAP_box ( bu pixel masklarining togriligini olchaydi)
+Benchmark dataseti  -  COCO
+
+
+
+Panoptic Segmentation 
+Panoptic Segmentation Semantic va Instance qiladigan ikkalasini ham ishini bajaradi.
+Sanab bo'ladigan obyektlarni yani Thingsni (masalan olma,mashina,odam kabi) Instance(alohida obyekt)larga ajratadi.
+Sanab bolmaydigan obyektlarni yani Stuff,fonni (masalan osmon,suv,yer,maysa kabilarni) Semantic class qiladigan ish yani bitta classga ajratadi.
+Har bir piksellar,piksellar toplami uchun Segment ID(noyob,unique) va category ID(class ID) va Instance ID ni beradi.
+
+Class ID = obyektning turi.
+Instance ID = bir xil klassdagi obyektlarni bir-biridan ajratadigan ID.
+Segment ID = rasm ichidagi har bir alohida segment/region uchun unique ID.
+
+Model faylida  -sem.pt yoki -seg.pt kabi yozilmaydi.Panoptic Segmentation uchun odatda maxsus panoptic arxitekturalardan foydalaniladi, masalan Mask2Former, Panoptic FPN kabi modellar.
+Metrigi - PQ(PQ=SQ×RQ)
+Benchmark dataseti  -  COCO Panoptic 
+
+
+
+
+mIoU = mean Intersection over Union degani.
+Barcha klasslar uchun IoU natijalarining o‘rtacha qiymati.
+IoU — bu model topgan mask bilan haqiqiy maskning qanchalik ustma-ust tushganini o‘lchaydi.
+mIoU esa — segmentation modelining barcha klasslar bo‘yicha predicted mask va true mask qanchalik yaxshi mos tushganini o‘rtacha hisoblaydigan metric.
+
+
+mAP_box- bu modelning bounding boxlarini qanchalik to'g'ri topganini olchaydi.Yanayam aniqrogi obyektning joylashuvi va bounding box aniqligi
+mAP_mask - esa modelning Segmentation masklari qanchalik togri ekanini olchaydi.Yanayam aniqrogi obyektning aniq shakli,maski qanchalik to‘g‘ri segment qilinganini o‘lchaydi.
+
+
+
+
+PQ = Panoptic Quality(sifati) degani.
+Bu Panoptic Segmentation modelini baholash uchun ishlatiladigan asosiy metric.
+PQ metrigi model obyektni to‘g‘ri topdimi va uning maskini qanchalik aniq chizdi — ikkalasini birga o‘lchaydi.
+PQ ikki qismdan iborat:
+PQ=SQ × RQ
+Bu yerda:
+SQ = Segmentation Quality
+→ topilgan segmentlarning maski qanchalik aniq shuni olchaydi
+RQ = Recognition Quality
+→ segmentlar to‘g‘ri topildimi, keraksizlari ko‘pmi, ba’zilari o‘tkazib yuborildimi degani
+SQ = mask qanchalik aniq?
+RQ = obyektlar qanchalik to‘g‘ri topildi?
+
+Misol uchun:
+Rasmda aslida 5 ta obyekt bor. Model 4 tasini to‘g‘ri topdi va ularning masklari ham yaxshi chiqdi.
+Shunda:
+Recognition yaxshi + Mask quality yaxshi = PQ yuqori
+Agar model obyektlarni topsa-yu, masklar noto‘g‘ri bo‘lsa:
+RQ yuqori
+SQ past boladi
+→ PQ pasayadi
+Agar masklar yaxshi bo‘lsa-yu, ko‘p obyektni topolmasa:
+SQ yuqori
+RQ past boladi
+→ PQ pasayadi
+Shuning uchun PQ juda foydali metricdir.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+Semantic, Instance, Panoptic Segmentation nimalarda qo'llaniladi?
+
+Semantic 
+Semantic Segmentation esa rasmdagi har bir pixel qaysi klassga tegishli ekanini aniqlash kerak bo‘lgan joylarda qo‘llaniladi.
+Misol uchun:
+Road      → yo‘l pixellari
+Sky       → osmon pixellari
+Grass     → o‘t pixellari
+Building  → bino pixellari
+Lekin u odatda bir xil klassdagi obyektlarni alohida instance qilib ajratmaydi. Masalan 3 ta mashina bo‘lsa, hammasi shunchaki CAR bo‘lib qoladi.
+qollanishga misollar:
+Road Segmentation — yo‘lni ajratish. Avtonom mashina yoki robot rasmda qayeri yo‘l, qayeri trotuar ekanini biladi.
+Medical Imaging — tibbiy tasvirlar. MRI yoki CT rasmida tumor, organ yoki kasallangan hududni pixel darajasida ajratadi.
+Satellite Land Cover — sun’iy yo‘ldosh rasmlari. Suv, o‘rmon, bino, yo‘l, qishloq xo‘jaligi yeri kabi hududlarni ajratadi.
+
+
+
+
+
+
+Instance
+Instance Segmentation bir xil klassdagi har bir obyektni alohida ajratish kerak bo‘lgan joylarda ishlatiladi.
+Masalan rasmda 3 ta mashina bo‘lsa:
+Car #1
+Car #2
+Car #3
+deb har birini alohida mask bilan ajratadi.
+qollanishga misollar:
+Fruit Counting — mevalarni sanash. Har bir olma yoki mevani alohida topadi va sanaydi.
+Cell Segmentation — hujayralarni ajratish. Mikroskop rasmidagi har bir hujayrani alohida segment qiladi.
+Warehouse Packages — posilkalarni ajratish. Konveyerdagi har bir qutini alohida aniqlaydi.
+
+
+
+
+Panoptic
+Panoptic Segmentation butun sahnani to‘liq tushunish kerak bo‘lgan joylarda qo‘llaniladi.
+Panoptic Segmentation — muhitni ham, muhit ichidagi alohida obyektlarni ham bir vaqtda tushunish kerak bo‘lganda ishlatiladi.
+Ya’ni u bir vaqtning o‘zida:
+Stuff:sanalmaydigan
+road
+sky
+grass
+wall
+floor
++
+Things:sanaladigan
+car #1
+car #2
+person #1
+person #2
+larni ajratadi.
+qollanishga misollar:
+Smart City / CCTV - Ko‘cha kameralarida yo‘l, trotuar, bino kabi muhitni ham, odam va mashinalarni ham alohida ko‘radi. Tirbandlik, piyoda oqimi, transport monitoringida ishlatiladi.
+Autonomous Driving — o‘z-o‘zini boshqaruvchi mashinalar. Yo‘l, osmon, sidewalk kabi hududlarni va har bir mashina, odam, velosipedni alohida aniqlaydi. Bu xavfsiz harakat va obstacle understanding uchun juda foydali.
+Agriculture - Tuproq va o‘simlik hududlarini segment qiladi, shu bilan birga har bir meva yoki o‘simlikni alohida instance sifatida ajratishi mumkin.
