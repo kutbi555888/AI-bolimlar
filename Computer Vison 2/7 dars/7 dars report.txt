@@ -1,0 +1,67 @@
+7 dars report
+
+Segmentation bu qaysidir classga tegishli obyektni piksellarni toplami bilan chegarasini togri aniq chizib keyin shu obyektni biror rangga boyab,mask qilib boshqa obyektlardan ajratib korsatish
+
+Detection obyekt qayerdaligini bounding box bilan korsatish
+Segmentation esa qaysi piksellar shu obyektga tegishli shuni korsatadi
+Segmentation rasmning har bir pikseliga,piksellar toplamiga class beradi
+
+Segmentation turlari:
+1.Semantic segmentation
+Rasmdagi har bir pikselga,piksellar toplamiga class beradi.bir xil classlarni bir xil rangga boyaydi.
+Misol uchun:
+ rasmda daraxt ,osmon,daryo,maysalar,hayvonlar,qushlar bolsa daraxtlar yaxshil,osmon moviy,daryo kok,maysalar yashil,hayvonlar jigarrang,qushlar sariq rang qilib boyaydi.har bir hayvonni yoki qushni korib chiqib har birini xususiyatini aniqlab harxil rangga boyamaydi.
+Yani bu sayozroq korib chiqadi
+
+
+2.Instance Segmentation 
+Bu turda esa bir xil classdagi har bir objectni korib organib chiqib boyaydi.
+Misol uchun Rasmda qushlar bolsa Semanticga oxshab bu qush deb bir xil rangga boyamasdan  ularni har birini organib bu 1chi qush,bu 2chi qush deb har xil rang bilan boyab korsatadi
+Instance Segmentationda:
+Class
+Bounding Box
+Mask
+Confidence
+Shular korsatiladi
+
+Yani Instance Semanticga qaraganda chuqurroq organadi va koproq malumot beradi
+
+3.Panoptic Segmentation 
+Semantic Segmentation + Instance Segmentationni birlashtirilgani.
+Bu turda Semantic Segmentation qiladigan ish ham, Instance Segmentation qiladigan ish ham ikkalasi birdan bajariladi.
+
+Semantic nima qilar edi:
+Semantic faqat classlarni boyaydi,lekin bu classga tegishli bir xil obyektlarni har birini alohida boyamaydi
+
+Instance nima qilar edi:
+Instance rasmda biror classlar bolsa va shu classga tegishli bir xil obyektlar bolsa Instance shu bir xil obyektlarni har birini korib chiqib har xil rangga boyaydi va Class ID beradi.Misol uchun #qush1,#qush2,#qush3 qilib.
+
+Endi Panoptic esa Semantic qiladigan ish classlarga nom beradi Instance qiladigan qaysidir classdan bir xil obyektlar bolsa shu obyektlarning har birini alohida korib har xil rangga boyaydi va class ID beradi.va yana Panoptic Instance ID ham beradi
+
+Yani Panoptic Instancega qaraganda juda chuqur organadi,hamma obyektlarni organadi va juda kop malumot beradi
+
+Semantic sanab bolmaydigan misol uchun osmon,yer,daryo,daraxtlar va shu kabi fonlarga yaxshi
+Instance esa sanaladigan obyectlarga yaxshiroq
+Panoptic esa ham sanab bolmaydigan ham sanaladigan obyectlarga yaxshiroq
+
+Semantic arxitekturalariga
+FCN 2015
+U-Net 2015 (Tibbiyotda eng yaxshi)
+DeepLab 2016+
+
+Instance arxitekturalariga
+Mask-R-CNN 2017
+YOLACT 2019
+
+Panoptic arxitekturalariga 
+Panoptic FPN 2019
+
+Segmentation Loss Functionlari
+Cross-Entropy(CE) - classificationda
+Dice Loss - muvozanatsiz classlarda
+IoU/Jaccard Loss - Detection + Segmentationda
+Focal Loss - qiyin piksellarda,qiyin misollarda
+
+Semanticda evaluation metric - mIoU
+Instanceda evaluation metric - AP_mask
+Panopticda evalution metric - PQ

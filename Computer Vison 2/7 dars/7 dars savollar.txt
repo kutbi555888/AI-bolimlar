@@ -1,0 +1,108 @@
+7 dars savollar
+
+1.Dice Loss va Cross-Entropy Loss o'rtasidagi farq nima?
+2. Nega U-Net skip connection lardan foydalanadi? Ular qanday muammoni hal qiladi? 
+3. Mask R-CNN Faster R-CNN ni instance segmentation uchun qanday kengaytiradi? 
+4. Panoptic Quality (PQ) nimani o'lchaydi va u qanday hisoblanadi? 
+5.Segmentationni 3ta turiga 3tadan real   loyiha yozing va foydali,plus tomonlarini ham
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+1.Cross-Entropy har bir pixelni alohida klassifikatsiya muammosi sifatida ko‘radi.har bir pixelning to‘g‘ri klassifikatsiya qilinishiga qaraydi
+
+Asosiy farqlari
+Cross-Entropy: 
+har bir pixel qanchalik to‘g‘ri klassifikatsiya qilindi.shuni olchaydi.
+Dice: 
+prediction mask va true,haqiqiy mask umumiy shakl sifatida qanchalik overlap qildi yani bir biriga qanchalik mos tushdi shuni olchaydi.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+2. chunki encoder rasmni kichraytirib borganda aniq joylashuv va mayda detallar yo‘qolib boradi.Bu jarayonda model obyekt nima ekanini yaxshi o‘rganadi, lekin: 
+
+chegarasi qayerda? 
+
+aniq shakli qanday? 
+
+kichik detal qayerda? 
+degan ma’lumotlarning bir qismi yo‘qoladi.
+
+Segmentationda esa aynan shu detallar juda muhim.
+Shuning uchun U-Net encoderning oldingi qatlamlaridagi batafsil ma’lumotni decoderga to‘g‘ridan-to‘g‘ri uzatadi. Mana shu yo‘l skip connection deyiladi.
+
+sodda qilib aytsak: 
+
+Encoder: 
+"Rasmda nima borligini o‘rganadi." 
+
+ Decoder: 
+"Uni qayerga joylashtirishni tiklaydi." 
+
+ Skip connection: 
+
+"Yo‘qolib ketgan aniq detal va joylashuvni decoderga qaytaradi."
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+3. Faster R-CNN ikki asosiy narsani beradi 
+
+Har object uchun: 
+1. Class 
+2. Bounding box 
+
+Mask R-CNN nima qo‘shadi? 
+Mask R-CNN Faster R-CNN ustiga: 
+uchinchi branch — mask prediction branchni qo‘shadi.yani shu obyectni togri chegara bilan boyab ajratish boshqa obyectlardan
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+4.Panoptic segmentation: 
+
+Semantic 
++ 
+Instance 
+ikkalasini birlashtiradi. 
+
+Shuning uchun oddiy IoU metric yetarli emas. 
+Biz ikkita narsani bilmoqchimiz: 
+
+1. Objectlar to‘g‘ri topildimi? 
+2. Ularning masklari qanchalik aniq? 
+
+PQ aynan shu ikkalasini birga o‘lchaydigan metrikdir.
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+
+5. 
+Semantic 
+1.Yo‘lni segmentatsiya qilish / yo‘l qismini ajratish.Rasm ichidan qaysi joy yo‘l, qaysi joy yo‘l emasligini aniqlash
+2.O‘simta hududini segmentatsiya qilish.MRI yoki CT rasmidan tumor joylashgan qismini aniqlash.
+3.Sun’iy yo‘ldosh rasmlarida yer qoplamini segmentatsiya qilish.Sun’iy yo‘ldosh rasmidagi hududlarni:
+suv
+o‘rmon
+yo‘l
+bino
+qishloq xo‘jaligi yerlari
+kabi klasslarga ajratish.
+
+
+Instance 
+1.Mevalarni aniqlash va sanash
+Daraxtdagi har bir mevani alohida aniqlash.
+2.Ombordagi posilkalarni alohida segmentatsiya qilish.Konveyer ustidagi har bir package’ni alohida aniqlash.
+3.Hujayralarni segmentatsiya qilish.Mikroskop rasmidagi har bir hujayrani alohida aniqlash.
+
+
+Panoptic
+1.O‘z-o‘zini boshqaruvchi avtomobil tizimi.Mashina kamerasi butun yo‘l sahnasini tushunadi.
+2.Aqlli shahar kuzatuv kamerasi.Ko‘cha kamerasi:
+Road
+Sidewalk
+Building  
+Kabilarni aniqlaydi,sanaydi
+3.Omborda ishlaydigan aqlli robot.Robot ombor ichidagi:
+Pol
+Devor
+Quti
+Odamlar
+Ni aniqlaydi va odamlarga toqnashmasdan qutilarni topib,izlab oladi
