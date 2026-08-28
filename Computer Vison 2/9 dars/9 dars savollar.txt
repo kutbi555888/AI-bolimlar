@@ -1,0 +1,123 @@
+9 dars savollar
+
+1.result.masks.data ni shape (N,H,W) korinishida
+Misol uchun: print(result.masks.data.shape)  qilsak
+Natija  torch.Size([5, 640, 640]) chiqadigan bolsa
+5   → topilgan 5 ta alohida obyekt / 5 ta mask
+640 → mask balandligi (Height)
+640 → mask kengligi (Width)
+N = nechta instance topilganligi
+H = mask balandligi
+W = mask kengligi
+
+
+
+
+2.retina_masks=True — YOLO segmentationda masklarni original rasm o‘lchamida, yuqori aniqlikda qaytarish uchun ishlatiladi.
+retina_masks=True ishlatilganda mask original resolutionda qayta ishlanadi.
+Qachon ishlatamiz:
+aniq mask kerak bo‘lsa
+maskni original rasm ustiga chizmoqchi bo‘lsak
+pixel sonini hisoblamoqchi bo‘lsak
+Ya’ni retina_masks=True yangi obyektlarni ko‘proq topib bermaydi. U asosan chiqqan segmentation masklarning resolutionini original rasmga moslab, aniqroq ko‘rinishda qaytaradi.
+
+
+
+
+3.Semantic Segmentation natijasi — har bir pixelga,pixellar toplamiga class beradi.
+Instance Segmentation natijasi esa — har bir alohida obyektga class va  alohida mask beradi.
+
+Misol uchun Semanticda rasmda 5ta mashina bolsa Semantic hammasini bittta rangda boyab bitta mashina classini beradi.
+Instance Segmentationda esa har bir mashinani alohida ranglarda boyab har bir mashinaga mashina1,mashina2,mashina3 deb nom beradi
+
+Endi Output tomonini aytadigan bolsak,
+Semantic Segmentation class mapp beradi.class mapning ichidagi sonlarning har bori class ID
+Instance Segmentation esa har bir object uchun:
+Class
+Confidence score
+Bounding Box
+Mask
+beradi.
+
+eng asosiy farq — Instance obyektlarni alohida-alohida ajratadi, Semantic esa faqat ularning klassini pixel,pixellar toplami darajasida ko‘rsatadi.
+
+
+
+
+4.ONNX —  bu Open Neural Network Exchange, ya’ni modelni turli framework va platformalarda ishlatishga mos standart format.
+
+.pt
+→ modelni train qilish va PyTorch'da ishlash uchun juda qulay
+.onnx
+→ tayyor modelni boshqa muhitlarga olib chiqib inference/deployment qilish uchun juda qulay
+
+Eng oson usuli: Ultralytics orqali ONNX modelni ishlatish:
+Agar biz YOLO modelidan foydalansak, eng sodda yo‘li bu:
+from ultralytics import YOLO
+model = YOLO("best.onnx")
+results = model("image.jpg")
+qilib ishlatish
+
+best.pt
+→ asosan PyTorch ekotizimi
+best.onnx
+→ ONNX Runtime
+→ C++
+→ C#
+→ Java
+→ boshqa deployment muhitlari
+uchun qulayroq.
+
+ONNX'ning pluslari:
+PyTorch o‘rnatmasdan inference qilish mumkin.
+CPU'da yaxshi ishlashi mumkin.
+C++, C#, Java kabi tillarda ishlatish osonlashadi.
+Serverga joylashtirish qulay.
+Mobile/edge tizimlarga olib chiqish osonroq.
+ONNX Runtime bilan optimallashtirish mumkin.
+Keyinchalik TensorRT kabi backendlar bilan ishlash imkoniyati mavjud.
+
+
+
+To‘liq YOLO segmentation misoli
+
+from ultralytics import YOLO
+# ONNX modelni yuklash
+model = YOLO("best.onnx")
+
+# Prediction
+results = model(
+    "image.jpg",
+    conf=0.25,
+    retina_masks=True
+)
+
+result = results[0]
+
+# Bounding boxlar
+print(result.boxes)
+
+# Masklar
+if result.masks is not None:
+    print(result.masks.data.shape)
+
+# Natijani ko‘rsatish
+result.show()
+
+
+
+
+
+
+Ultralytics bilan ishlatish:
+from ultralytics import YOLO
+model = YOLO("best.onnx")
+results = model("test.jpg")
+r = results[0]
+
+for box in r.boxes:
+    print(box.cls)
+    print(box.conf)
+
+if r.masks is not None:
+    print(r.masks.data.shape)
