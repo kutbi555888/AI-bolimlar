@@ -1,0 +1,60 @@
+10 dars savollar
+
+PPTda 2ta savol bor ekan qolgan uchtasi korinmay qolibdi
+Ozim 3ta savol qoshdim
+
+Savollar
+1.Fine tuning va Scratchning farqi nima?
+2.data.yamlda nc nimani bildiradi?
+3.patience nima vazifani bajaradi?
+4.best.pt bilan last.pt ning farqi nima?
+5.mAP50 va mAP50-95 metriklarining farqi nima?
+
+
+1.Fine Tuning bu 0dan model qurish emas.Fine Tuning bu pretrained modellarni ozimizni data bilan ozroq train qilib modelni ozimizni datamizga,maqsadimizga moslab qayta  oqitish.
+Pretrained model bu minglab,millionlab datalar bilan o'rgatilgan model.
+Yanada aniqrogi boshqa katta datasetda oldindan o‘qitilgan, keyin yangi vazifaga moslashtirish mumkin bo‘lgan model.
+
+From Scratch esa bu modelni 0dan boshlab oqitish,model yaratish.
+
+
+
+
+
+2.data.yamlda nc bu number of classes degani.yani classlarning soni nechtaligini korsatadi:
+Misol uchun:
+nc: 5
+Bu rasmda 5ta class bor degani
+
+
+
+3.patience degani bu nechtadir epochda natija yaxshilanmasa training toxtaydi.nechta epochda toxtashini ozimiz qolda belgilash mumkin
+
+
+4. best.pt bu validation loss(xato) eng kam bolgan model
+last.pt esa bu oxirgi epochdan keyingi model.bunda kopincha overfitting bolish ehtimoli ham bolishi mumkin.chunki model organaverib,organaverib yodlab olgan bolishi mumkin.
+
+
+
+5.mAP50 va mAP50-95 ikkalasi ham modelning object detection yoki instance segmentation aniqligini baholaydi. Yani prediction box,mask va haqiqiy box,mask qanchalik bir biriga mos tushdi shuni olchaydi.farq — qaysi IoU thresholdlarda hisoblanishi.
+IoU — prediction box/mask bilan haqiqiy box/maskning qanchalik ustma-ust tushganini ko‘rsatadi.
+
+mAP50 nima?
+Bu prediction box,mask bilan haqiqiy box,mask 50% mos tushsa bu yetarli deydi.yani objectni umumiy joyi to‘g‘rimi shuni korsatadi.
+mAP50 — nisbatan yumshoqroq metric.
+
+mAP50-95 nima?
+mAP50-95 esa faqat bitta thresholdni emas, quyidagi thresholdlarning hammasini ishlatadi:
+0.50
+0.55
+0.60
+0.65
+0.70
+0.75
+0.80
+0.85
+0.90
+0.95
+Har bir threshold uchun AP hisoblanadi, keyin o‘rtachasi olinadi.
+Shuning uchun mAP50-95 ancha qattiqroq metricdir.
+Bu metric model faqat objectni taxminan topishi emas, juda aniq joylashtirishini ham korsatadi.
