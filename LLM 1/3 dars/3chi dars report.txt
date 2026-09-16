@@ -1,0 +1,67 @@
+hardware nima?
+hardware bu fizik jihatdan hisoblash qurilmalaridir
+
+GPU bu parallel hisoblash uchun juda kuchli protsessordir
+
+Cluster degani birgalikda ishlaydigan kop serverlar,GPUlar
+
+Ingestion nima?
+datani tizimga olib kirish
+
+Filtering nima?
+keraksiz datalarni chiqarib tashlash
+
+Deduplication nima?
+takroriy datalarni olib tashlash
+
+Integer ID bu tokenning raqami
+
+Transformer bu Attention va MLPga asoslangan neural architectura
+
+Seq2Seq bu bir sequence(ketma ket tartib)dan boshqasini yaratish
+Seq2Seq’ni amalga oshirishning keng tarqalgani — encoder–decoder. Bu bitta tizimni ichidagi ikki asosiy bo‘limdir:
+Encoder — kirishni sonli ko‘rinishda ifodalovchi bo‘lim.
+Decoder — shu ma’lumot asosida chiqish ketma-ketligini yaratuvchi bo‘lim.
+
+Hyperparameter bu trainingdan oldin inson ozi belgilaydigan sozlamalar
+
+Self-supervised nima?
+labelni yani targetni dataning o‘zidan olish
+
+Emergence nima?
+scale,hajm bilan yangi qobiliyatning keskin,tosatdan namoyon bo‘lishi
+
+Monitoring bu tizimni ishlayotgan payti kuzatish
+
+Evaluation bu modelning sifatini o‘lchash
+
+Parameter nima?
+model trainingda o‘rganadigan son
+
+Token nima?
+model qayta ishlaydigan matnning bir bolagi
+
+Reasoning
+modelning mantiqiy xulosa chiqarish,mantiqiy fikrlash va masala yechish qobiliyati
+
+Latency bu so‘rov yuborilganidan yoki biror harakat bajarilganidan keyin tizim javob berishigacha o‘tadigan vaqt. javobni kutish vaqti deb tushunsa bo‘ladi.
+
+Privacy
+ma’lumotlarning maxfiyligi
+
+Quantization
+model tez va yaxshi ishlashi va modelni boshqa tizimlarga ko'chirganda,deployment qilganda weightlarni kamroq bit bilan ifodalash
+
+Inference
+train bolgandan keyin modeldan javob olish
+
+Multimodal bu
+bitta modelda text, image, audio,video kabi bir nechta modellar bilan ishlash
+
+
+RAG — Retrieval-Augmented Generation degani.
+Tashqaridan kerakli ma’lumotni topib, shu ma’lumotga tayangan holda javob yaratish
+Bu LLM uchun juda muhim texnologiya, chunki oddiy LLM faqat o‘zi trening paytida o‘rgangan bilimlariga tayanadi. RAG esa modelga tashqi manbalardan yangi yoki maxsus ma’lumotni olib kelib, keyin javob berishga imkon beradi.
+
+Summarization bu matnni qisqartirib mazmunini saqlab qolish.
+
