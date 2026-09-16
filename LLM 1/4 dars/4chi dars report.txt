@@ -1,0 +1,263 @@
+Embeddings nima?
+Embedding bu matnni model tushunishi uchun raqamli formatga o'tkazish, SMLda bu Encoding deyiladi.Words, Tokens, Images, Voice kabilar bular discrete categorical datalardir.
+discrete categorical data -  alohida-alohida kategoriyalarga ega,uzluksiz bo‘lmagan datadir. datalar raqamli formatda emas categoriya matnlar bolgani uchun model bu datalarni tushunishi qiyin va tushunmaydi.va bular 1chi high dimensional boladi,embedding esa ularni low dimensional raqamli vektorlarga aylantradi.
+Vector — tartiblangan sonlar ketma-ketligi.
+Dimension — vektordagi raqamlarning soni.
+
+model textni tushunmaydi lekin raqamlarni tushunib raqamlar bilan ishlay oladi.
+
+bitta token minglab sonlardan iborat bolishi mumkin.yani bu degani bitta token haqida juda koplab malumot degani.
+masalan Llama da 1ta token 4096ta,   Gemini da esa 3072ta
+
+embedding sonlar integer emas floating point boladi
+Floating-point = kasrli sonlarni kompyuterda ifodalash formatidir
+
+token IDni raqami mano bermaydi mano tokenlardagi vectorlar Ichida yoyilib ketgan(distributed representation) boladi.
+
+qaysi tokenlar,vectorlar bir biriga yaqin bolsa osh tokenlar bir biriga mano jihatdan yaqin boladi
+
+Embedding vector ichida tilga oid ko‘p turdagi signallar bolishi mumkin.masalan birlik/kolpik, pozitiv/negative ,  fe'l/ot
+
+vectorlardagi har bir raqam aniq bitta savolga javob bermaydi. Har bir ma’no juda ko‘p sonlar bo‘ylab tarqalgan — bu  Distributed Representation deyiladi.
+
+encoding va embeddingni bir nechta farqlarini aytadigan bolsak:
+encoding:
+qat'iy qoidalarga asoslangan
+mano yoq
+vocabulary kattargani sari hajm o'sib ketaveradi
+
+embedding:
+trainingda modelni ozi organadi
+chuqur manolar bor ozi organgani uchun
+vocabulary belgilab qoyilgan
+
+
+EMBEDDING TURLARI:
+input embedding:
+Token embedding - Tokenning lug‘aviy/statik boshlang‘ich representationi. token embedding faqat lug‘aviy ma’noni beradi, matndagi tartibni bilmaydi
+RoPE / positional information - Position Embedding nima uchun kerak?
+Transformerning Attention mexanizmi o‘z-o‘zidan tokenlarning tartibini to‘liq bilmaydi.masalan soz bitta tokendan iborat lekin bitta token bolsa ham bularning ma'nosi boshqacha bolishi mumkin.shuning uchun token manosi + position axborot birgalikda kerak.
+
+output embedding
+Contextual - contextga qarab embedding boladi. boshlang‘ich representationi static bo‘lishi mumkin, Transformer qatlamlaridan o‘tgani esa contextual bo‘ladi.
+
+tarixiy,eski embeddinglar
+Static embedding - o‘zgarmas embedding. Bu polysemy muammosini keltirib chiqaradi. Polysemy = bitta so‘zning bir nechta ma’noga ega bo‘lishi.
+Absolute positional embedding - Har position uchun alohida representation. 
+Relative positional embedding - nisbiy position embedding
+
+RoPE = Rotary Position Embedding
+Rotary = aylanuvchi
+positionni,joyini alohida vector qilib shunchaki qo‘shish o‘rniga, Q va K vectorlarining raqamlarini positionga bog‘liq burchak bilan aylantiradi
+Real RoPE vector dimensionlarini juft-juft olib, turli frequencylarda aylantiradi.
+
+
+[9/16/2026 12:28 AM] .: Embeddings nima?
+Embedding bu matnni model tushunishi uchun raqamli formatga o'tkazish, SMLda bu Encoding deyiladi.Words, Tokens, Images, Voice kabilar bular discrete categorical datalardir.
+discrete categorical data -  alohida-alohida kategoriyalarga ega,uzluksiz bo‘lmagan datadir. datalar raqamli formatda emas categoriya matnlar bolgani uchun model bu datalarni tushunishi qiyin va tushunmaydi.va bular 1chi high dimensional boladi,embedding esa ularni low dimensional raqamli vektorlarga aylantradi.
+Vector — tartiblangan sonlar ketma-ketligi.
+Dimension — vektordagi raqamlarning soni.
+
+model textni tushunmaydi lekin raqamlarni tushunib raqamlar bilan ishlay oladi.
+
+bitta token minglab sonlardan iborat bolishi mumkin.yani bu degani bitta token haqida juda koplab malumot degani.
+masalan Llama da 1ta token 4096ta,   Gemini da esa 3072ta
+
+embedding sonlar integer emas floating point boladi
+Floating-point = kasrli sonlarni kompyuterda ifodalash formatidir
+
+token IDni raqami mano bermaydi mano tokenlardagi vectorlar Ichida yoyilib ketgan(distributed representation) boladi.
+
+qaysi tokenlar,vectorlar bir biriga yaqin bolsa osh tokenlar bir biriga mano jihatdan yaqin boladi
+
+Embedding vector ichida tilga oid ko‘p turdagi signallar bolishi mumkin.masalan birlik/kolpik, pozitiv/negative ,  fe'l/ot
+
+vectorlardagi har bir raqam aniq bitta savolga javob bermaydi. Har bir ma’no juda ko‘p sonlar bo‘ylab tarqalgan — bu  Distributed Representation deyiladi.
+
+encoding va embeddingni bir nechta farqlarini aytadigan bolsak:
+encoding:
+qat'iy qoidalarga asoslangan
+mano yoq
+vocabulary kattargani sari hajm o'sib ketaveradi
+
+embedding:
+trainingda modelni ozi organadi
+chuqur manolar bor ozi organgani uchun
+vocabulary belgilab qoyilgan
+
+
+EMBEDDING TURLARI:
+input embedding:
+Token embedding - Tokenning lug‘aviy/statik boshlang‘ich representationi. token embedding faqat lug‘aviy ma’noni beradi, matndagi tartibni bilmaydi
+RoPE / positional information - Position Embedding nima uchun kerak?
+Transformerning Attention mexanizmi o‘z-o‘zidan tokenlarning tartibini to‘liq bilmaydi.masalan soz bitta tokendan iborat lekin bitta token bolsa ham bularning ma'nosi boshqacha bolishi mumkin.shuning uchun token manosi + position axborot birgalikda kerak.
+
+output embedding
+Contextual - contextga qarab embedding boladi. boshlang‘ich representationi static bo‘lishi mumkin, Transformer qatlamlaridan o‘tgani esa contextual bo‘ladi.
+
+tarixiy,eski embeddinglar
+Static embedding - o‘zgarmas embedding. Bu polysemy muammosini keltirib chiqaradi. Polysemy = bitta so‘zning bir nechta ma’noga ega bo‘lishi.
+Absolute positional embedding - Har position uchun alohida representation. 
+Relative positional embedding - nisbiy position embedding
+
+RoPE = Rotary Position Embedding
+Rotary = aylanuvchi
+positionni,joyini alohida vector qilib shunchaki qo‘shish o‘rniga, Q va K vectorlarining raqamlarini positionga bog‘liq burchak bilan aylantiradi
+Real RoPE vector dimensionlarini juft-juft olib, turli frequencylarda aylantiradi.
+
+
+Attention — Transformerning asosiy aloqa mexanizmidir
+Attention gapdagi so‘zlarning bir-birini ko‘rishiga va ular o‘rtasidagi munosabatlarni hisoblashga imkon beradigan matematik quroldir.
+Attention faqat eng muhim bitta so‘z qaysi? degan savolga javob bermaydi.eng muhim narsa bu pairwise relationship.
+Pairwase relationship - juft juft munosabat
+Yani har bir tokenning boshqa token bilan aloqasini organadi.Attention shu aloqalarni score,ball ko‘rinishida hisoblaydi.
+Attention eng muhim sozni emas masalan Attention:
+Token A uchun:
+Token B qanchalik muhim?
+Token C qanchalik muhim?
+Token D qanchalik muhim?
+
+
+Boshqa token uchun yana boshqa weightlar:
+Token B uchun:
+Token A qanchalik muhim
+Token C qanchalik muhim
+Token D qanchalik muhim
+Shuni aniqlaydi
+Shuning uchun bitta “eng kuchli soz” yo‘q
+
+
+
+Attention qayerda ishlatiladi?
+Inputlar Embeddingga aylantiriladi
+(Token + RoPE)
+
+ ↓
+
+Transformer Layer
+
+ ↓
+
+Attention
+Korinishida boladi
+Endi Attentionni asosiy vazifasiga otamiz.Attention embeddingdan kelgan alohida/bog‘lanmagan,manosiz vectorlarni context(oldingi gap,gapning umumiy mazmuni)ga bog‘lab, ma’noli representation(matnning sonli ifodasi)ga aylantiradigan mexanizmdir.
+Attention minglab sahifaga teng uzun textdagi tokenlar orasidagi bog‘lanishni ham aniqlashi mumkin
+
+Embedding va Attention raqobatchi emas
+Embedding va Attention bitta jamoadir
+Embedding = "Bu token nima?"
+RoPE = "Bu token qayerda?"
+Attention = "Bu token boshqa tokenlar bilan qanday 
+bog‘langan?"
+MLP = "Yig‘ilgan umumiy axborotnini qanday yanada rivojlantiramiz?"
+Degan savolga javob beradi
+
+Embeddings sozlar, ma'no va joylashuv haqida input malumot tayyorlaydi.
+Attention esa ularni aralashtirib, umumiy ma’noni topadi.sozlarni bir biriga qaratish orqali mano topadi
+
+
+Attention asosan 3ta xususiyatga ega bolishi kerak:
+tez bolishi
+arzon bolishi 
+Katta hajmda oqiy olishi
+
+Agar biror malumotni oqishi,izlashi kerak bolsa har bir oldingi malumotni qaytadan oqishi kerak boladi.bu esa ortiqcha tokenni isrof qilishdir.shuning uchun ularni eslab qolishi kerak boladi
+Buning uchun Query, Key, Value degan narsa oylab topilgan.
+Query = so‘rov.
+Kim qilgan,nima,qanday holatda deb har bir sozga mos savolni beradi
+“Men nimani qidiryapman?”
+Query = token hozir boshqa tokenlardan qanday ma’lumot qidirayotganini ifodalovchi representation.
+
+K — Key,kalit
+Men mana shu haqidagi malumotman
+“Men qanday turdagi malumotni bera olaman?”
+Har bir token o‘zida bir Key olib yuradi.
+
+V — Value,qiymat
+Value — tokenning haqiqiy foydali ma’lumoti.
+“Topilgan tokendan qanday ma’lumot olish kerak?”degan savolga javob beradi
+“Agar meni tanlasang, men senga qanday ma’lumot beraman?”
+degan savollarni misol qilsak boladi bularni tushunish uchun
+Savolga haqiqiy javob Valuedan olinadi desak ham boladi
+
+
+
+Q,K,V
+LLMda har bir token yaratilishida Q,K,V vektorlari ham yaratiladi
+model har bir keyingi tokenni yaratganda bundan oldingi tokenlarning Key va Value vektorlari kerak boladi.chunki har bir keyingi token ozidan oldingi tokenlarning Key va Value vektorlaridan foydalanib yaratiladi.shu yerda aynan KV Cache(vaqtinchalik xotira,faqat shu savol bergan paytidagina ishlaydi) degan mexanizm kerak boladi
+
+KV Cache bu har bir keyingi token yaratilganda ozidan oldingi tokenlarning Key va Valuelarini vaqtinchalik saqlab turadigan xotiradir.agar KV Cache bolmasa har bir keyingi token yaratilishi uchun ozidan oldingi tokenlarning barcha Key va Valuelarini qaytadan hisoblab chiqish kerak boladi.misol uchun agar 1000 ta token bolsa 1001chi token yaratilishi uchun bundan oldingi 1000ta token Key va Valuelari yana qaytadan boshlab hisoblab yaratilishi kerak boladi.har bir token yaratilganda shunday hamma Key valuelar qaytadan yaratiladi agar KV Cache bolmasa.bu esa juda katta isrof,xarajat,resurs,pul,vaqt ketishiga sabab boladi.
+
+Lekin KV Cache ni bitta muammosi bor:
+
+KV cache juda katta memory,xotira egallaydi.
+bu muammo asosan attentionning MHA(Multi head attention)turida uchraydi
+
+KV Cache xotira muammosini hal qilish Attentionnni 3ta turidan birini tanlashga bogliq
+
+Attentionni 3ta turi bor bular:
+1.MHA - Multi Head Attention
+2.MQA - Multi Query Attention
+3.GQA - Grouped Query Attention
+
+
+Attention inference paytida bitta dona emas.uni koplab boshqa attention head(boshlari) bolib ular ham ishlaydi
+
+MHA - bunda asosan har bir head  bitta Key va Bitta Value ga ega boladi.masalan 20ta attentionni headlari bolsa shu 20tani har birida Bitta Key va bitta Value bor. natija yaxshi,aniq bolishi mumkin lekin xotira juda ham tolib ketish muammosi bor bu Turda
+
+MQA - bunda asosan nechta head bolsa shu umumiy headlarni barchasiga faqat 1ta key va 1ta value beriladi. xotira muammosi yoq, tez, lekin aniqlik kam
+
+GQA - bu balans. MHA kabi aniqroq va MQA kabi tezroq va xotira kop egallamaydi. bunda asosan headlar bir nechta guruhlarga bolinib, shu har bir bolingan guruhga bitta key va bitta value beriladi. masalan 20ta query head bolsa 5tadan 4ta guruhga bolinadi. shu 4ta guruhning har biriga bitta key va bitta value beriladi
+
+ 
+
+Context Optimization turlari
+Context Optimization modelga uzun contextni imkon qadar kam compute,resurs,xarajat va memory,xotira bilan qayta ishlatishga yordam beradi.chunki har doim ham hamma tokenlar bir biriga qarashi kerak emas bolishi ham mumkin.orniga yonidagi tokenlarga,oxirgi tokenlarga qarash yetarli bolishi mumkin.
+
+1.Full Attention - bu hamma tokenlarga, hamma tokenlar bir bir biriga qarashga,malumot yigishga ruxsat beradi
+
+2.Sparse Attention(siyrak attention) - bunda esa hamma tokenlar bir biriga qaramaydi. faqat bir nechta tokenlar yoki belgilangan tokenlar yoki asosiy tokenlar bir biriga qaraydi
+.Sparse Attentionni turlari kop. shulardan biri:
+Sliding Window(sirgaluvchi oyna) - Har bir token faqat o‘ziga yaqin bo‘lgan tokenni ko‘radi.
+
+Juda katta hujjat / kitoblarda GQA + Sparse yoki GQA + Sliding Window yaxshi variant
+Sababi:
+GQA:
+KV memoryni kamaytiradi.
+Sparse/Sliding:
+attention compute complexityni kamaytiradi.
+
+
+Real-time / streamingda  GQA + Sliding Window yaxshi
+Sababi:
+yangi data uchun eng so‘nggi context ko‘proq muhim, juda eski ma’lumotni doim ko‘rish shart emas.
+
+
+Sparse Attention nega ishlatiladi?
+
+uzunroq context ishlatish mumkin;
+GPU memory kamroq ishlatiladi;
+attention tezroq ishlaydi;
+inference arzonlashishi mumkin;
+training ham samaraliroq bo‘lishi mumkin.
+
+
+LLM 2ta turga boinadi;
+
+1.Local LLM - mahalliy, o‘zimizni qurilmamizdagi LLM model
+2.Claude Based LLM - tashqi kompaniyaning serveridagi LLM model.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
