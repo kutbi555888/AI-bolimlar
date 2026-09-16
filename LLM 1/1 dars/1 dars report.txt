@@ -1,0 +1,186 @@
+[9/14/2026 2:40 PM] .: 1 dars
+
+LLM - Large Language Models
+SLM - Small Language Models
+LM- Language Models
+
+Language Models nima?
+Agar ozidan oldingi sozga qarab keyingi sozni yoki tokenni predict qilsa bu Language Models(next word prediction,next token prediction).
+Va LMs ni parametrlari ham kam boladi
+
+Large Language Models(katta til modeli) nima?
+LLMda parameterlari juda kop,juda katta boladi.juda katta dataset boladi.juda katta neural network boladi.juda kop resurs ketadi(gpu)
+Trainingda model juda kop data,kitoblar,veb sahifalar,maqolalar,kodlar va boshqa juda kop data bilan oqitiladi.
+
+LM bilan LLMning farqi nima?
+LM avtomatik ozidan oldingi sozga qarab keyingi sozni predict qiladi
+
+LLM bu LMning kattaroq kuchliroq versiyasidir.oddiy kichkina LM modellar faqat avtomatik ozidan oldingi sozga qarab keyingi sozni predict qilishi mumkin.Lekin LLM esa 
+savollarga javob javob yozadi
+tarjima qiladi
+summarization yani yakunlab umumiy xulosa qiladi
+codni generatsiya qiladi yani yaratadi
+matn yozadi
+reasoning yani mulohaza yuritadi,mantiqiy fikrlaydi
+
+token bilan so'z har doim bir biri bilan teng bo'lmaydi.bu tokenization turlariga bogliq.har bir tokenization so'zlarni turli token qismlariga boladi.
+masalan BPE(Byte pair encoding) o'zi bilgan,tanigan trainingda ko'p ko'rgan so'zlarni masalan bitta sozni 1ta token qilishi mumkin.lekin yangi soz uchrasa yoki trainingda ko'p ko'rmagan so'zi bo'lsa uni hali ko'rmagani uchun bitta so'zni juda kop qismlarga bolishi mumkin.
+
+Frontier modellar - bu hozirda eng zamonaviy,eng oxirgi,kuchli,har tomonlama aniq,ma'noli,tez va har tomonlama kuchli bolgan modellar.bu modellarga juda katta pul va resurs sarflangan.masalan ChatGPT,Clauede,Gemini kabi
+
+LLM model yaratishda eng asosan Transformer degan NNdan foydalaniladi va LLM yaratilgandan keyin ham Transformer asosiy ishni bajaradi.
+Transformer asosan 2ta qismdan tashkil topgan.
+1.Attention layer(Self Attention Layer)
+2.MLP Layer(Feed Forward Network - FFN)
+
+FLOP(Floating Point Operation) - LLM modelni oqitish paytida bajariladigan matematik amallarni sonini o'lchash uchun ishlatiladigan o'lchov birligi.yana modelni oqitib uni ishlatish paytida bajariladigan matematik amallarni sanashga ham qo'llanadi.
+
+Emergence - Paarametrlar oshgan sari kutilmaganda malum bir hajm chegarasidan otganda namoyon bo'ladigan modelni qobiliyati.masalan accuracy oshadi.aniqlik oshishi kabi
+bu katta modellarda uchraydi,kichkina modellarda emas
+
+Model yaratishda 3turdagi bilim kerak:
+1.Mexanika
+2.Fikrlash tarzi
+3.Intuitsiya
+
+Bitter Lesson
+AI da 2ta organish bor.1tasi inson qo'lda o'z bilgan bilim,usul,qoidalarini yozib modelni o'rgatadi.
+2chi modelga data beriladi,compute beriladi,arxitektura tanlanadi va AI modelga shu narsalarni sanga berdim endi o'zing tahlil qilib hammasini o'rgan deyiladi.va model o'zi takror takror xato qilib xatosini togrilab organadi.
+Inson bu narsaga juda kop marta guvoh bolgani uchun Bitter lesson(achchiq dars) deb nom beradi.
+Yani doim inson modelni qolda yozib orgatganidan modelga data,resurslarni berib o'zi organgani ustun keladi degan mano.
+
+Language modellar goyasini 1chi 1948 yilda Claude Shannon boshlab bergan
+
+Layer bu ma’lumotni matematik hisob kitoblar orqali qayta ishlaydigan qatlam.
+Masalan :
+Input kiradi
+layer 1 ga otadi malumot ishlanadi
+Input 2chi Layerga otadi endi shu ishlangan malumot yana qayta ishlanadi
+Input 3chi layerga otadi shu malumot qayta ishlanadi
+Shunday qilib nechta layer bolsa hamma layerlardan otib qayta qayta ishlanib input  oxirida output bolib chiqadi
+
+
+Attention layer - har bir tokenlarni bir biriga bogliqligini aniqlaydi.tokenlar bir biri bilan gaplashadi,bir biridan malumot oladi.asosan tokenlarni juft juft aloqadorligini aniqlaydi.yani qaysi token bilan qaysi token bir biriga bogliq shuni.va gapning umumiy mazmuni nimadan iborat shuni aniqlaydi.muhim sozlar,tokenlarni aniqlaydi.
+Attention tokenni boshqa tokenlarning konteksti bilan boyitadi.
+Attention tokenning vektoriga kontekstdan kelgan ma’lumotni qo‘shib berdi.
+Attention tokenlar orasidagi ma’lumotni aralashtiradi.
+[9/14/2026 2:40 PM] .: MLP Layer — har bir token ichidagi ma’lumotni qayta ishlaydi.
+Transformerda MLP ko‘pincha Feed-Forward Network yoki FFN deb ham ataladi.
+MLP Attentionga oxshab boshqa tokenlarga qaramaydi balki Attention orqali yig‘ilgan ma’lumot bilan har bir tokenni sonli ifodasini boshqa songa o'zgartiradi,qayta ishlaydi va undan yangi ichki featurelar,xususiyatlar hosil qiladi.son bu tarqalgan malumotning bir qismi.
+MLP eski featurelardan yangi featurelar hosil qiladi
+MLP trening paytida qaysi feature kombinatsiyalari foydali ekanini o‘rganadi.
+
+Tokenizer har bir matn bolaklariga Token ID beradi
+
+Scaling Laws - bu bashorat,taxmin qilish.
+Yani ozimizda bor parametr,token,data,GPUlarni hisoblab,arxitekturani tanlab shu ozimizda bor narsalar bilan qanday natijaga erishish mumkin,modelni performancesi,aniqligi qancha bolishi mumkin shuni bashorat,taxmin qilishdir.
+Yanayam aniqrogi ozimizdagi bor narsalarni hisoblab shu bor narsalar bilan model qurmoqchi bolsak qancha xarajat ketadi shuni hisoblashdir.
+Modelni qurishdan oldin ko'r ko'rona ozimizda bor narsalarni hisoblamasdan,oylamasdan pul sarflansa xarajat kop ketib qolishi mumkin.bunda ozimiz zarar koramiz.
+Model qurishda iloji boricha kamroq xarajat bilan yaxshi natijaga erishishni o'ylash kerak
+Scaling Laws formulasi:
+C=6×N×D 
+C - qancha xarajat ketishi
+6 bu 2 Flop +4 Flop. Yani 2 bu Forward,    4 bu Backward 
+N- Parametrlar soni
+D - Tokenlar soni
+
+
+Chinchilla qonuni
+Hoffman bu goyani topgan. DeepMind 2022 
+Tokenlar soni parametrlar sonidan 20 baravar kop bolishi kerak degan qoida.shunda natija yaxshi chiqadi degani.Oldinlari odamlar koproq parametr bolishi kerak deb oylagan lekin vaqt,tajriba  shuni korsatdiki tokenlar parametrlarni sonidan kop bolishi kerak ekan.
+
+Common Crawl — bu internetdagi juda katta miqdordagi ochiq veb-sahifalarni avtomatik yig‘ib, arxivlab, tadqiqotchilar va kompaniyalarga foydalanish uchun taqdim qiladigan notijorat loyiha yoki tashkilot
+Lekin Common Crawl tozalangan dataset emas.uni ichida duplicate,spam,reklama va boshqa juda kop kerak emas datasetlar kop.
+Shuning uchun avval bu Common Crawldagi malumotlar filterlanadi.
+Bu bir necha bosqichlardan iborat:
+1.Quality filtering(Heuristics,Classifier)
+2.Deduplication(takror malumotlarni olib tashlash)
+3.Language Identification(qaysi tildagi matn ekanligini aniqlash)
+4.Toxicity(toksik,zararli matnlarni olib tashlash)
+Quality Classification (Fine web edu style)
+
+
+Alignment - bu inglizchada moslashtirishdir.
+Yana ham aniqroq aytsak AI modelning xatti-harakatini inson istagi, ko‘rsatmasi, maqsadi va xavfsizlik talablariga moslashtirish.
+alignmenti yaxshi bo‘lgan model:
+savolni tushunadi,
+Biz so‘ragan tilda javob beradi,
+kerakli formatni saqlaydi,
+mavzudan chiqib ketmaydi,
+xavfli vazifa bo‘lsa ehtiyotkor ishlaydi va ehtiyotkorona javob beradi
+Alignment — bu bitta alohida algoritm nomi emas.
+Alignment uchun turli metodlar ishlatilishi mumkin:
+SFT
+RLHF
+RLAIF
+DPO
+preference optimization
+safety training
+rejection training
+reward modeling
+Alignment nimalarni moslashtirishga harakat qiladi?
+Masalan:
+1. Helpful
+Helpful = foydali.
+Savolga amaliy javob berishi.
+2. Harmless
+Harmless = zarar yetkazmaslikka intilish.
+3. Honest
+Honest = ishonchli va yolg‘on ishonch bilan gapirmaslik.
+4. Instruction following
+Foydalanuvchining ko‘rsatmasiga amal qilish.
+5. Style
+Kerakli uslubda javob berish.
+6. Safety
+Xavfli so‘rovlarda xavfsiz xatti-harakat.
+
+
+
+
+
+
+
+
+SFT - Supervised Fine Tuning
+Supervised bu nazorat ostida o‘qitish.
+Modelga:
+Input va to‘g‘ri javob ko‘rsatiladi.
+Fine-Tuning
+Fine-tuning bu oldindan o‘qitilgan modelni ma’lum vazifa,maqsadga yoki xatti-harakatga moslab qo‘shimcha o‘qitish.
+SFT bu modelni tayyor input-output misollar orqali qo‘shimcha o‘qitish.
+
+
+
+RLHF nima?
+RLHF - Reinforcement Learning from Human Feedback
+Tarjimasi inson feedbacklaridan foydalanib reinforcement o'qitish
+[9/14/2026 2:40 PM] .: Reinforcement Learning bu mukofot orqali o‘rganish.
+Model yaxshi harakat qilsa reward yani mukofot oladi.
+Human feedback bu inson bergan baho yoki fikr.
+Masalan odam Response A va  Response B ni orasidan A ni tanlashi mumkin.keyin model keyingi safar javob berganda shu inson tanlagan variantga mos javob berishni boshlaydi.
+Shu ma’lumotdan reward model yoki preference optimization tizimi foydalanishi mumkin.
+
+
+
+Tokenization bu model yaxshi tushunishi uchun matnni kichik token bolaklarga bolib beradigan va har bir tokenga ID beradigan Algoritm
+
+
+BPE - Byte Pair Encoding - Hozirda standart bolgan,hamma foydalanadigan,katta LLM kompaniyalari ham foydalanadigan Tokenizationning bir turi.
+BPE(Byte pair encoding) o'zi bilgan,tanigan trainingda ko'p ko'rgan so'zlarni masalan bitta sozni 1ta token qilishi mumkin.lekin yangi soz uchrasa yoki trainingda ko'p ko'rmagan so'zi bo'lsa uni hali ko'rmagani uchun bitta so'zni juda kop qismlarga,tokenlarga bolishi mumkin.Ya'ni tez-tez uchraydigan yonma yon harflarni,sozlarni bosqichma-bosqich birlashtirib token lug‘atini quradi
+
+
+
+
+Tokenization turlari:
+1.Character tokenization
+Har bir harfni,belgini 1ta token qiladi.yaxshi tomoni yangi soz uchrasa ham har bir belgini,harfni bitta token qilib ketaveradi.yomon tomoni tartib,sequence juda uzun,xotira tolib ketadi
+
+2.Byte tokenization
+Baytma bayt tokenlarga boladi.yani harf yoki belgi qancha Byte olishiga qarab.ingliz tilida bolsa kamroq token oladi.lekin ingliz tilida bolmagan soz belgilar bolsa kop tokenlarga bolinishi mumkin.byte 0 va 255 oraligida boladi
+1 byte 8bit. 8bit esa kompyuterdagi eng kichik axborot birligidir.yani 0 yoki 1 bolishi mumkin
+
+3.Word tokenization
+Har bir sozni bitta token qiladi.ingliz tilidagi sozlar bolsa bitta soz bitta token olishi mumkin lekin ingliz tilidan boshqa tillar bolsa bu nomalum soz UNK yani unknown(noma'lum) token deb belgilanadi.bu esa model tushunmasligiga sabab boladi
+
+4.BPE
+BPE - Byte Pair Encoding - Hozirda standart bolgan,hamma foydalanadigan,katta LLM kompaniyalari ham foydalanadigan Tokenizationning bir turi.BPE(Byte pair encoding) o'zi bilgan,tanigan trainingda ko'p ko'rgan so'zlarni masalan bitta sozni 1ta token qilishi mumkin.lekin yangi soz uchrasa yoki trainingda ko'p ko'rmagan so'zi bo'lsa uni hali ko'rmagani uchun bitta so'zni juda kop qismlarga,tokenlarga bolishi mumkin.Ya'ni tez-tez uchraydigan yonma yon harflarni,sozlarni bosqichma-bosqich birlashtirib token lug‘atini quradi
