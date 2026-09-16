@@ -1,0 +1,148 @@
+token va word tushunchasi
+token bu model qayta ishlaydigan kichik matnning bolagi
+word bu model tushunishi uchun tokenlarga bolinadigan malumot
+
+token bilan sozning 3xil holati bor bular:
+1.token bilan soz teng miqdorda boladi (soz agar ingliz tilida bolsa yoki trainingda kop korgan bolsa)
+2.token kop word kam boladi (agar model bu sozni trainingda kop kormagan bolsa yoki yangi sozni korsa)
+3.token kam soz kop boladi (agar soz ingliz tilida bolsa va model bu sozni trainingda juda kop korgan bolsa)
+
+sozlarda tokenlarning har xil chiqishi masalan bitta sozda token kam bitta sozda token kop bolishining sababi model qaysi tillarda yoki qaysi tilda kop training qilinib oqitilgan bolsa shu kop korgan sozini kam tokenga ajratadi yoki bitta sozni bitta token qiladi. bu asosan BPE tokenization turiga kiradi.qolgan tokenization turlari ham ozini qoidalariga kora sozni,belgini tokenga ajratadi.shuning uchun tokenlar kam yoki kop chiqishiga yana bir asosiy sabab tokenization turlariga ham bogliqligidir.
+masalan ingliz tilida har bir soz 1ta token bolishi mumkin.chunki kop modellar ingliz tilida oqitiladi.agar boshqa tilda oqitilsa boshqa tillarda ham bitta soz bitta token bolishi mumkin.bu BPE tokenization turida.qolgan tokenization turlarini qoidalari boshqacha.
+misol uchun ispan tilida 2ta soz 5ta token bolishi mumkin
+yapon tilida esa 1ta fraza 11ta token bolishi
+hind tilida esa 3ta soz 11ta va undan kop token bolishi mumkin
+chunki model bu tillarda kop oqitilmagan,bu tillarni sozlarini kop kormagan
+
+
+
+agar chat modelni ingliz tilini bilmaydigan boshqa til vakillari ishlatsa token xarajati ham shunga qarab boladi.ingliz tili bolsa kamroq token ketadi,boshqa tillar bolsa koproq token ketadi va koproq token koproq narx degani,context tez tolib qoladi yani modelga kontekst limiti belgilangan boladi yani qanchadir token limit,agar ingliz tilida bolsa token kamroq ketgani uchun kontekst belgilangan limit boyicha boladi,agar boshqa tilda bolsa token kop ketgani uchun matn qisqaroq bolib kontext tez tolib qoladi.
+va javob ham sekin bolishi mumkin
+
+
+tokenlarning 4ta turi
+1.whole-word tokens(butun soz) ,  bitta soz bitta token(tez tez korgan sozlarini)
+2.subword tokens(murakkab soz)  ,  murakkab soz bolsa sozni bir nechta tokenlarga bolish
+3.character/fragment tokens  ,   juda kam uchraydigan belgi,harflar alohida alohida tokenga bolinadi.masalan bitta belgi bitta token shaklida
+4.non word elements(soz bolmagan belgi,ishoralar)  ,  har bir belgi bitta token
+
+
+
+immunization to typos(xato yozilgan yozuvni togrisini topish) -  vocabularyda har bir soz bitta butun soz bolmasligi mumkin ingliz tilida bolsa ham.agar user sozni xato yozsa model bu soz nima degani ekan deb oylanib otirmaydi shartta vocabularyga qarab shu xato yozilgan sozni kichik tokenlarga ajratib sozni nima yozilganini modelni ozi aniqlab oladi shu xato yozilgan yozuvlarga nisbatan immunitet hisoblanadi.
+
+
+
+DeepLearningdagi hamma narsalar Parameters, gradients, optimizer state, activations va input data barchasi tensorlarda saqlanadi.shu jumladan LLMda ham kop narsalar tensorda saqlanadi.chunki LLM ning orqasida NN, Deep Learning turibdi
+
+
+
+Floating-point — kompyuterda kasrli, juda katta yoki juda kichik sonlarni ifodalash usuli.
+Floating-point = sonni “asosiy raqamlar × daraja” ko‘rinishida saqlash usuli.
+
+
+Dynamic Range - eng katta va eng kichik ifodalanadigan musbat sonlar oralig‘i.
+
+
+Precision bu aniqlik
+
+
+BF16 - Brain Floating Point 16(16 bit),   floating point turi
+
+
+Underflow:
+son format ifodalay oladigan eng kichik qiymatdan ham kichik bo‘lib qolishi.
+
+
+Overflow:
+son format ifodalay oladigan maksimal qiymatdan kattalashib ketishi.
+
+
+Mixed Precision
+Mixed = aralash. Precision = aniqlik.
+Ya’ni training davomida bir nechta son formatidan birgalikda foydalanish degani
+
+
+Memory Accounting nima?
+Memory = xotira. Accounting = hisob-kitob.
+modelni ishga tushirishdan oldin qancha GPU memory kerakligini hisoblash.
+
+
+OOM = Out Of Memory - xotira yetishmasligi.
+GPUga kerakli tensorlar sig‘masa CUDA out of memory xatosi chiqadi.
+
+
+Activation - filter, kerakli malumotlarni otkazib keraksizlarini tashlaydi
+
+
+Activation checkpointing / gradient checkpointing:
+barcha oraliq activationsni memoryda saqlamasdan, faqat ayrimlarini saqlash va backwardda kerak bo‘lganlarini qayta hisoblash.
+
+
+
+Checkpointingning mohiyati:
+Ko‘proq activation saqlash  ko‘proq memory  kamroq qayta hisoblash 
+Kamroq activation saqlash  kamroq memory  backwardda ko‘proq compute
+Bu compute-memory trade-off deyiladi.
+
+
+Trade-off
+Bir narsani yaxshilash evaziga boshqasidan xarajat qilish yoki voz kechish
+
+
+View nima?
+View:
+shu data storage’ni nusxalamasdan boshqa shape/index ko‘rinishida ko‘rish.
+
+
+Clone - to‘liq nusxa yaratish.
+
+Contiguous tensor - uzliksiz tensor
+
+Matrix multiplication = matritsalarni ko‘paytirish.
+
+
+FLOP = Floating-Point Operation = floating-point son ustidagi bitta matematik amal.
+FLOPs - jami bajariladigan floating-point operatsiyalar.
+FLOP/s - sekundiga nechta floating-point operation.
+
+Peak FLOP/s - Har GPUning nazariy maksimal tezligi.
+
+
+MFU - Haqiqiy foydalanish samaradorligi.
+MFU = Model FLOPs Utilization - model FLOPlaridan foydalanish samaradorligi.yoki GPU dan qanchalik darajada foydalanish
+
+
+GPU Communication = GPUlar/serverlar orasida ma’lumot almashish
+
+
+Forward pass:
+inputni model bo‘ylab oldinga o‘tkazib prediction/loss hisoblash.
+
+
+Backward pass:
+lossdan boshlab gradientlarni model bo‘ylab orqaga hisoblash.Bu backpropagation deyiladi.
+
+
+Parameter Initialization nima?
+Initialization = boshlang‘ich qiymat berish.
+Trainingdan oldin weightlarni qanday sonlardan boshlash juda muhim.
+Agar weightlar juda katta berilsa:
+activations → qatlamdan qatlamga kattalashadi → exploding boladi(portlaydi va natijada sonlar juda kattalashib NaN yani son sifatida aniqlanmay qoladi),  NaN bu Not a Number — son sifatida aniqlanmagan natija.
+Agar juda kichik bolsa:
+activations/gradients → kichrayadi → vanishing boladi(sonlar juda kichrayib ketib gradient 0ga teng bolib model organmaydi)
+
+
+
+Xavier Initialization - Maqsadi activation variance layerdan layerga haddan tashqari o‘zgarib ketmasin deydi.
+Variance = dispersiya, qiymatlarning o‘rtacha atrofida tarqalishi.
+yana bitta maqsadi:
+weight hajmi dimensionga,olchamga mos kamaytirilmasa activations portlab ketishi mumkin.shuning uchun xavier initialization qollanadi
+
+
+Reproducibility = tajribani qayta bajarib, bir xil/yaxshi taqqoslanadigan natija olish 
+
+Weight decay
+Weightlarni sekin 0 tomonga tortadigan regularization.
+
+training loop - jarayonni bitta zanjirga tizish
+
