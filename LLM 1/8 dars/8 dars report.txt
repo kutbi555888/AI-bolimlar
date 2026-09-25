@@ -1,0 +1,45 @@
+Vector embedding — so‘z, token, gap, rasm kabi narsalarning ma’nosini sonli vector orqali ifodalash.token ID bu int model int lardan organa olmaydi.shuning uchun vectorlar yani float ga otkaziladi.
+Nega tokenni vectorga aylantirish kerak?
+Chunki Transformer matnni togridan togri tushunmaydi.Unga sonlar kerak.
+Training davomida model shu vectorlarning qiymatlarini o‘rganadi.har bir bitta son bitta sozni anglatmaydi. Ma’no butun vectorning birgalikdagi joylashuvida saqlanadi.
+
+
+Attention nima edi?Attention bu tokenlar bir biri bilan gaplashib ular orasidagi bogliqlikni topib berar edi.Transformerdagi Attention layer int lardan organa olmaydi shuning uchun bizga vectorlar yani float kerak boladi
+
+
+
+Vector Embeddingni 2ta turi bor bular:
+1.wte(word token embedding) - token IDni vectorlarga,floatga otkazadi
+
+2.wpe(word position embedding) - token IDni positionini,joylashuvini vectorga aylantiradi.
+
+Masalan odam kitob oqidi va kitob oqidi odam degan soz bolsa bunga faqat wte berilsa wte faqat token ID ni vectorga aylantiradi positionni emas. Positionni esa wpe beradi. Shuning uchun wte va wpe birga qollaniladi.
+
+Hozirda WTE  zamonaviy modellarda ham Token Embedding sifatida mavjuddir.yani token IDni vectorlarga aylantirish.
+Lekin WPEni orniga hozirda RoPE — Rotary Positional Embedding ishlatiladi.
+
+Local LLM larni qayerlardan topish mumkin.
+Local LLM larni katta qismi Hugging faceda mavjud. Va yana Ollama da ham mavjud.
+
+
+
+AutoModel — bu Hugging Face transformers kutubxonasidagi avtomatik model loader/class selector.
+Yanada aniqrogi:
+AutoModel bu modelni nomiga qarab, uning qaysi arxitektura ekanini avtomatik aniqlab, kerakli model classini yuklaydigan vosita.
+
+Masalan:
+from transformers import AutoModel
+model = AutoModel.from_pretrained("gpt2")
+desak gpt2 model yuklanadi
+
+Nega AutoModel kerak?
+Agar AutoModel bo‘lmasa modelga mos classni o‘zimiz bilishimiz kerak.
+Masalan GPT-2:
+from transformers import GPT2Model
+model = GPT2Model.from_pretrained("gpt2")
+kabi yozib yurish kerak
+
+AutoModel bilan esa:
+from transformers import AutoModel
+model=AutoModel.from_pretrained(model_name)
+qilishni ozi yetadi.
