@@ -1,0 +1,45 @@
+LLM hozirda AIni juda kop sohalarida ishlatilmoqda. SML, DL(NN), CV va boshqa sohalarda. Biz LLM yaratganda SML dan foydalanmasligimiz mumkin lekin SML yaratganimizda albatta LLM kerak boladi.
+
+
+
+Anthropic ni qanday qilib insonlarni savollariga javob berishini ko'rib chiqamiz.yani keyingi tokenni qanday yaratishini
+1.request beriladi
+2.Tokenization(tokenlarga bolinib har bir tokenga token ID beriladi)
+3.Embedding(har bir token ID vectorlarga aylantiriladi)
+3.contextualization(tokenning boshlang‘ich embeddingi contextga qarab yangilanib, aniqroq,toliqroq ma’noli representationga aylanadi)
+4.Keyingi token logitlari(modelni xom ballari) chiqariladi va shu xom ballar Softmax orqali foyiz korinishiga o'giriladi.
+5.Generation(keyingi token yaratiladi va decoding qilib matn korinishida javob beriladi)
+
+
+Misol uchun olma vitaminga boy meva degan gap bolsa bu yerda :
+Tokenization tokenlarga bolib token ID beradi.
+Wte olmani token ID siga boshlangich vector embedding beradi.keyin contextga qarab,layerlardan otgani sari bu vectorlar aniq manoga qarab ozgarib boradi.
+
+Wpe olmani gapda qayerda turganini aniqlaydi
+GPT-2 model Position ID yaratadi va wpe position ID ni vectorlarga,floatlarga ogiradi.
+Wpe olmani joylashuvini vectorlarda(floatlarda) korsatadi.
+
+
+Residual Connection - bu oldingi,eski malumotni yangi malumotga qoshadigan bir vosita
+Aniqrogi original malumot /Attention bu malumotni qayta ishladi yangi malumot hosil boldi Residual Connection esa shu bundan oldingi original malumot bilan Attention qayta ishlagan shu original malumotni bir biriga qoshadi.
+Keyin shu Residual Connection qoshgan malumot MLP(FFN)ga otadi.keyin MLP ham Residual qoshgan malumotni qayta ishlaydi.keyin Residual yana shu oldingi Attention qayta ishlagan malumot bilan MLP qayta ishlagan malumotni bir biriga qoshadi.keyin shu Residual qoshgan malumot keyingi layerga otadi.Residual esa yana shu oldingi malumot bilan layer qayta ishlagan malumotni bir biriga qoshadi,keyingi layerga otadi.shunday qilib davom etaveradi.
+
+max_tokens - bu modelga bitta so'rovga javob sifatida qancha yangi token ishlatishga yoki yaratishga ruxsat berganini bildiradi.
+masalan : max_tokens=1000 bolsa bitta so'rovga javobda maximum 1000ta token yaratiladi.Masalan model gapni tugatmagan bo‘lsa ham 1000ta token limit tugasa, response,javob shu yerda uzilishi mumkin.bu nega kerak chunki userlar juda kop va katta savol berganda model kop token yaratib yuborsa bu modelni oziga xotirasiga gpuga katta zarar bolishi va ishdan chiqishi buzilishi mumkin
+
+EOS - End Of Sequence ya’ni Ketma-ketlik tugadi degan manoni bildiradi.yani user savol berdi va model savolga javob berishni tugatdi va tizimda EOS yozuvi chiqadi,bu chiqgan EOS yozuvi userga korinmaydi u model javobini tugatgandan keyin model ozi EOS yozuvini chiqaradi va bu modelni men javobni tugatdim degani boladi.EOS vocabularydagi maxsus token bo‘lib, model uni keyingi token sifatida tanlaganda javob tugadi degan signalni beradi.
+
+stop sequence - ketma ketlik to'xta degani. yani bu qachon ishlatiladi?buni user ishlatmaydi,buni dasturchi yoki tizim ishlatadi.yani stop sequence masalan: Chat modellarda ichkarida shunga o‘xshash maxsus struktura bo‘lishi mumkin ###, END, <answer> kabi. bunaqalardan juda kop bolishi mumkin va bularni har birining manosi bor,yana chat template lari ham bor.dasturchi shunday belgilarni oldindan bilib modelga shu belgilar chiqsa toxtat deyishi mumkin. masalan : stop = "<END>" qilsa shu belgi chiqgandan keyin model javobni tugatadi.
+
+
+Trades off - bir yaxshi narsani eaziga boshqa yaxshi tomoni bolgan narsadan voz kechish.yani uni ham buni tanlab bolmaydi vaziyat holat,maqsadga qarab yo uni tanlash kerak yoki buni degan mano.
+masalan misol sifatida koradigan bolsak;
+3ta model
+Claude Opus - eng kuchli murakkab masala,savol,topshiriqlarda reasoning kuchli,coding kuchli lekin xarajat va resurs koproq ketadi va javob berish vaqti sekinroq kuchli bolgani uchun
+Claude Sonnet - balans model.reasoning ortacha,coding ortacha,javob berish ortacha va resurs, xarajat ham ortacha ketadi, javob berish vaqti ham ortacha
+Claude Haiku - resurs xarajat kam ketadi, Javob berish vaqti tez lekin murakkab masala,savol,topshiriqlarda reasoning,coding,javob berish kuchsiz
+
+mana shu yerda trades off paydo boladi.yani endi biz maqsad,holat,vaziyatlarimizga qarab bittasidan voz kechib bittasini ishlatishimiz kerak boladi.
+murakkab masalalar bolsa Opus 
+ortacha topshiriq bolsa Sonnet
+murakkab emas, oddiy savol bolsa Haiku ni ishlatamiz
