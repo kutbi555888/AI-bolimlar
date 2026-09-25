@@ -1,0 +1,124 @@
+Ġ ning ma'nosi bo'sh joy borligini ifodalash uchun shu Ġ dan foydalanyapti.bu hamma modellarda har xil aynan Ġ emas Ġni orniga boshqa belgi masalan _ belgisini ishlatishi mumkin,
+
+LLM arxitekturasi
+1.text(input)
+2. Tokenization/Token ID
+3.Embedding vectorization(RoPE)
+4.RMS Normalization 
+5.Attention Layer(Self Attention)
+Keyin
+FFN Layer/SwiGLU yoki GeGlu activation functionlar
+6.Logitlar
+7.softmax yoki sampling
+8.keyingi token
+9. Chiqgan keyingi tokenni decoding yani matnaga aylantirish
+10.output
+
+
+
+Arxitektura tayyor bolgandan keyin Training bosqichi keladi.Trainingni 3ta qoidasi bor bular:
+Training iloji boricha:
+1.tez bolishi
+2. Arzon bolishi yani xarajat kamroq sarflash
+3.Xatoliklarsiz bolishi kerak
+
+
+
+Training asosiy 3ta qismdan iborat bular:
+1.Hyperparametrlar
+2.Training Stability 
+3.Regularization
+
+Asosiy Hyperparameterlarni koradigan bolsak bularga:
+Learning Rate(LR) 
+Batch Size
+Optimizer
+Warm_steps
+Weight_decay
+Kabilar kiradi
+
+
+Hyperparameter nima?
+Hyperparameter — model trainingdan o‘zi o‘rganmaydigan, biz oldindan belgilaydigan parametrdir
+
+
+Learning rate 
+Learning rate — model training paytida weightlar, ya’ni parametrlar har bir yangilanishda qanchalik katta qadam,son bilan o‘zgarishini,yangilanishini belgilaydigan sondir.
+Yanada aniqrogi:
+Learning rate bu model qanchalik tez o‘rganishini boshqaradigan qadamning kattaligi.
+Learning rate turlari:
+1. Base Learning rate (lr)  - model xatolardan qanchalik tez organishini belgilayadi
+2. Lr scheduler- Training vaqtida lr ni kattaligini sekinlik bilan pasaytirib borish.bunga cosine decay.bu lr qiymatini sekinlik bilan 0 ga tushiradi
+
+
+
+Batch size — LLM training paytida model bir vaqtning o‘zida nechta training misol(qancha token)ni qayta ishlashini bildiradi.
+Yanada aniqroq:
+Batch size - model bir qadamda nechta misolni birgalikda ko‘radi.
+Agar:
+batch size = 4bo‘lsa,  model birdaniga 4 ta namunani olib ishlaydi, loss hisoblaydi, gradient chiqaradi va weightlarni yangilaydi.
+
+
+Batch size turlari:
+1.Global batch size - bitta matematik qadamda,bitta yangilanishda gpular jami bolib qancha tokenni bir vaqtda hisoblash hajmi
+LLaMa 3 va GPT 4 oqitilishida 1soniyada 1mlndan 4mln tokengacha hisoblangan
+
+2.Per Device Batch Size - Global hajmni bolish uchun har bitta bitta dona Gpu chipining (H100/B200) xotirasiga sigadigan kichik hajm.
+Gpuni xotirasiga qarab 2,4,6,8 yoki 16 qilib belgilanadi.
+
+
+Training Hyperparameterlar
+Optimizer - weightlarni gradient aytgan son,yonalish boyicha yangilaydi. Frontier modellarda Standard AdamW ishlatiladi hozirda. beta1=0.9 , beta2=0.95 , eps=1e-8 kabi parametrlar
+
+Warmup Steps - training boshida lr ni birdaniga katta bermasdan, uni  lr ni sekinlik bilan kotarib borish.qizib olish. Umumiy training qadam qancha bolsa shundan 1%dan 5%gacha olinadi.odatda 2000 qadam.
+
+Gradient clipping - Gradientlar portlab ketmasligi uchun ularni malum chiziqda qat'iy kesib turadigan xavsizlik mexanizmi. Max- norm qiymati qat'iy 1.0 qilib belgilanadi.bu LLaMa va Geminida qat'iy qoidadir.
+
+Weight Decay - model hamma malumotlarni yodlab olmasligi uchun,overfitting bolmasligi uchun beriladigan matematik jarima,jazo. Standart qiymat 0.1 bu AdamW ni ichiga qoshiladi.
+
+Agar training stability bolmasa kop vaqt,kop pul, kop resurs ketadi.shuning uchun training stability juda muhim.
+Training Stabil ketmayotganligini qaysi muammolardan bilish mumkin? Bu asosan Exploding Gradients muammosi paydo bolganda training stability buziladi. Exploding gradients qanday sabablar tufayli kelib chiqadi? Bular: 
+1.kop layerlar bilan train qilinsa
+2.Warmup qilinmasa
+3.modelga juda kop xato matnlar berilsa
+Gradient portlashi mumkin
+Gradient portlashini qanday bilish mumkin? Bular :
+1.Training vaqtida loss kamayishni orniga juda kattalashib ketadi
+2. Loss=NaN yoki Loss=Inf bolib qoladi
+
+
+
+Endi bu muammolarni oldini olish uchun,trainingni stabil qilish uchun nima ishlar qilinishi kerak? Buning uchun:
+1. Lrni  Warmup qilish. Yani Lr ni sekinlik bilan oshirib borish, boshidan 0dan boshlash(data katta bolsa masalan 2000 qadamdan boshlash)
+2.Gradient Clipping qilish. Matematik chegara qoyish. Threshold qiymat 1.0 qoyish.bu har bir gradient 1dan oshib ketsa kesib tashlaydi,orqaga qaytaradi.
+[9/25/2026 7:26 PM] .: Regularization 
+Regularization — bu modelning training datani shunchaki yodlab olib, yangi datada yomon ishlashining oldini olish usullaridir.
+Regularization  modelni Training datani haddan tashqari yodlab olma, umumiy qonuniyatni,mantiqni o‘rgan deb cheklaydigan,majburlaydigan usullar to‘plamidir.
+Ya’ni regularizationning maqsadi generalization’ni yaxshilashdir.
+Generalization bu model ilgari ko‘rmagan yangi datada ham yaxshi ishlashidir.
+
+LLM lar kopincha overfitting bolishi kamroq uchraydi.chunki model juda kop data bilan oqitiladi va epoch ham 1 yoki 2 marta qilinadi.chunki shu bir marta trainingga ham ancha xarajat ketib qoladi.shuning uchun LLMda overfitting kam uchrasa ham overfittingni oldini olib qoyish uchun Regularization usullarini qollab qoyish kerak.
+Bular:
+1.Weight Decay - bu training paytida biror neyronning weighti haddan tashqari katta bolib ketmasligi uchun weightni orqaga tortib turadi.
+
+2.Dropout qilish
+Dropout — LLM training paytida ayrim activationlarni tasodifiy ravishda vaqtincha 0 qilib, modelning ma’lum neuron yoki featurelarga haddan tashqari bog‘lanib qolishini kamaytiradigan regularization usulidir
+Bu modelni bitta yo‘lni yodlab olish o‘rniga, ma’lumotni turli yo‘llar orqali qayta ishlashga majbur qiladi.har training bosqichda bir xil neuronlar emas, tasodifiy activationlar o‘chadi.
+
+Lekin LLMda faqat weight decayni ozi yetarli overfitting kam bolgani uchun.
+dropout=0.0 qilinadi.bu degani Dropout ishlatilmasin degani.
+
+Tokenization 
+Kompyuter qanday qilib inson tilini tushunadi.kompyuter sozni tushunmaydi.kompyuter faqat raqmlarni tushunadi va raqamlar orqali sozni,rasmni,ovozni,videoni tushunadi.
+LLMning asosi NNdir.NN esa faqat raqamlarni tushunadi.unda qanday qilib sozlarni raqamlarga otkazish mumkin.bu tokenization orqali bajariladi.
+Tokenization bu matnni kompyuter tushunadigan kichkina bolaklarga bolish.keyin bularning har biriga token ID beriladi .va shu Token IDlar embedding vectorization qilinadi.yani juda kichkina sonlarga otkaziladi.
+
+AI ni organishda Hugging face platformasi juda kerak boladi. Hugging face bu AI uchun GitHubdir. Hugging face ni ichida juda kop modellar,datasetlar,spacelar bor.
+Sayti : https://huggingface.co/
+
+
+Tokenization qismi:
+tokenizer_config.json(tokenizer settings)
+vocab.json(Token->ID mapping)
+merges.txt(BPE merge rules,bpe ni birlashtirish qoidalari)
+tokenizer.json(vocabulary and rules,qoidalar)
