@@ -1,0 +1,219 @@
+5 dars
+
+LLM model qurish bosqichlari
+
+1. DATA
+↓
+2. DATA PROCESSING
+↓
+3. TOKENIZER
+↓
+4. DATASET BUILDER
+↓
+5. MODEL
+↓
+6. PRETRAINING
+↓
+10. POST-TRAINING
+↓
+7. EVALUATION
+↓
+8. INFERENCE
+↓
+9. DEPLOYMENT
+
+
+1.Subword BPE (Byte Pair Encoding)
+Matnni Character (belgi) va Word (so'z) darajasi oralig'idagi subwordlarga (kichik qismlarga) ajratuvchi muvozanatli algoritm.
+2. Sequence lengthni juda uzaytirib yubormaydi va embedding table hajmini ulkan bo'lishidan saqlaydi. <unk> token muammosini yo'qotadi.
+3. Hozirda kop zamonaviy modellarda shu tokenizer qollaniladi.va modelni asosiy vocabularysi yani alifbosi sifatida ishlatiladi. 
+Vocabulary bu alifbo. Model shu alifbodan matnlarni oqiydi.
+4. Analogiya sifatida Lego ni olsak boladi. Tayyor ulkan uylar saqlanmaydida uni orniga har qanday narsani yasay oladigan bloklar saqlanadi.
+
+BPE merging qoidalari va merges.txt
+
+1.Eng ko'p takrorlanadigan token yoki belgilar juftligini birlashtirish va ularning ketma-ketlik tartibini saqlovchi qoidalar to'plamidir.
+2. Tokenizer matnni har doim bir xil qat'iy tartibda encoding qilishi uchun bu tartib juda muhim.
+3. Tokenizer training jarayonida hosil boladi va merges.txt faylida qoidalar(harf,sozlarning birlashish qoidalari) ketma ketligi saqlanadi.
+4.Matn encoding qilinganda merges.txt ichidagi qoidalar yuqoridan pastga qarab, qat'iy ketma-ketlikda matnga qo'llaniladi.
+5.Analogiya
+Taomni tayyorlash ketma ketligi yoki taomga mahsulotlarni qoshish ketma ketligi. Masalan, avval A va B ni qo'sh, hosil bo'lgan aralashmaga keyin C ni qo'sh' degan qat'iy ketma-ketlik qoidasi deb aytishimiz mumkin.
+
+
+Vocabulary size va trade offs
+
+1. Vocabulary size degani Tokenizer lug'atni hajmini kichik (masalan, 4k) yoki katta (32k) tanlash o'rtasidagi muvozanat va uning modelga ta'siridir.
+2. Kichik Vocabulary model embedding jadvalini kichraytiradi,Sequenceni uzunlashtiradi.lekin compute xarajatini oshiradi.sababi Kichik Vocabulary bo‘lsa Vocabularyda tayyor katta subwordlar kam bo‘ladi. Shuning uchun so‘z ko‘proq bo‘lakka bo‘linadi va sequence ham uzunlashadi.Kichik vocabularyning foydasi embedding jadvali kichik bo‘ladi. Lekin matn ko‘proq tokenlarga bo‘lingani uchun sequence uzunlashadi.koproq token degani koproq xarajat degani.
+ Katta Vocabulary esa aksincha sequence uzunligini qisqartiradi.Katta Vocabulary bo‘lsa Vocabularyda katta subwordlar va butun so‘zlar ko‘proq bo‘ladi.shuning uchun sozlar kamroq tokenlarga bolinadi.kamroq token degani kamroq xarajat degani.lekin embedding jadvali katta boladi.
+KICHIK VOCABULARY - embedding kichik ,so‘zlar ko‘proq bo‘linadi
+KATTA VOCAB - embedding katta , so‘zlar kamroq bo‘linadi
+
+ BpeTrainer ichida vocab_size=8000 parametridan boshlab, model arxitekturasini loyihalashda belgilanadi. 
+
+ Dataset va hisoblash resurslariga qarab optimal hajm tanlanadi.kichik Vocabularyda tokenlar ko'p marta ko'rinib yaxshi o'rganiladi. 
+
+Analogiya 
+Cho'ntak lug'ati va Katta Ensiklopediya. Cho'ntak lug'ati kichik, lekin bitta gapni tushuntirish uchun ko'p so'z ishlatish kerak bo'ladi. 
+
+
+Special Tokens (<eos>, <bos>, <pad>, <unk>)
+
+Yuqoridagi bu maxsus tokenlar Modelga matnning chegaralari yoki maxsus holatlarni tushuntirish uchun ishlatiladigan maxsus xizmatchi tokenlar hisoblanadi.
+
+<eos> packing jarayonida hujjatlarni ajratish uchun shart.
+Packing jarayoni — tokenlangan bir nechta qisqa hujjatlarni modelning context lengthiga mos bitta to‘liq sequence ichiga joylashtirish jarayoni.
+trainingdagi bo‘sh joyni kamaytirib, GPU compute’dan samaraliroq foydalanish usuli.
+hujjatlar orasiga odatda EOS token qo‘yiladi, shunda model bir hujjat tugab, boshqasi boshlanganini ajrata oladi.
+ Byte-level BPE ishlatsak <unk> tokeniga ehtiyoj qolmaydi. nega bpe da unk token muammosi chiqmaydi? Sababini korib chiqamiz
+bu gap aynan Byte-level BPE uchun to‘g‘ri. Sababi Byte-level BPE matnni eng boshida baytlargacha maydalab bera oladi.Masalan oddiy tokenizer vocabularyda biror yangi belgi yo‘q bo‘lsa tokenizer Vocabularyda topilmadi deb <unk> token deb yuborishi mumkin.
+Byte-level BPE esa boshqacha ishlaydi. Kompyuterdagi matn UTF-8 orqali bytelar ketma-ketligiga aylantiriladi. Byte qiymatlari atigi:
+0 ... 255 oraligida boladi.ya’ni 256 xil asosiy byte mavjud.Byte-level tokenizer shu 256 bytening barchasini ifodalay oladi. Shuning uchun notanish belgi chiqsa ham Notanish belgi - UTF-8bytelari -  bir nechta mavjud byte token
+ko‘rinishida bo‘linadi.
+Masalan yangi yoki kam uchraydigan Unicode belgi vocabularyda tayyor token sifatida bo‘lmasa ham, u:
+[byte1] [byte2] [byte3] ...
+ko‘rinishida encode qilinadi.
+
+Oddiy vocab-based tokenizer:
+belgi vocabda yo‘q
+<unk> chiqishi mumkin
+
+Byte-level BPE:
+belgi vocabda yo‘q
+bytelarga parchalanadi
+hamma byte mavjud
+<unk> kerak emas 
+
+Byte-level BPEda har qanday matn oxir-oqibat 256 ta asosiy byte orqali ifodalanishi mumkin. Shu sababli “bu belgini umuman bilmayman” degan holat deyarli yo‘q va <unk> tokeniga ehtiyoj qolmaydi.
+
+Tokenizerni train qilishda trainer = BpeTrainer(special_tokens=['<eos>']) ko'rinishida pipelinega kiritiladi.
+
+<eos> Matnlar oxiriga avtomatik ravishda qo'shiladi va sequence packing paytida hujjat tugaganini modelga bildiradi.
+
+Analogiya 
+Svetofor yoki Yo'l belgilari. <eos> xuddi gap oxiridagi nuqta yoki yo'ldagi 'To'xtash' belgisi kabi harakat chegarasini ko'rsatadi. 
+
+
+The Round-Trip Test
+
+Matnni encode qilib ID ga o'girib, so'ngra decode qilganda aynan osha asl matn qaytib kelishini tekshiruvchi assert testi. 
+
+Agar round-trip test buzilsa, demak ma'lumot yo'qolgan yoki tokenizer noto'g'ri ishlayapti. Bu test o'tmasa, keyingi qadamlar ma'nosiz boladi.
+
+Qayerda ishlatiladi?
+train_tokenizer.py skriptining eng oxirida, tokenizatorni yakuniy muzlatishdan (freeze) oldin majburiy tekshiriladi. 
+
+Qanday ishlatiladi?
+assert decoded_text == original_text kod satri orqali tekshiruv amalga oshiriladi. 
+
+Analogiya 
+Xatni o'zbekchadan inglizchaga tarjima qilib, keyin inglizchadan qayta o'zbekchaga o'girganda ma'no zarracha o'zgarmasligi tekshiruvi.
+
+
+Document-Level Data Splitting
+Qism B: Dataset Builder va Binary Format
+
+ Bu degani Ma'lumotlarni Train va Validation guruhlariga qator darajasida emas, balki butun boshli hujjat (document) darajasida ajratish.
+
+Data leakage (ma'lumot sizib chiqishi) oldini oladi. Bitta hujjat bo'linib ketsa, val_loss sun'iy ravishda pasayib o'lchov buziladi. 
+
+Qayerda ishlatiladi?
+Dataset builder pipelineni boshida, matnlar hali tokenizatsiya qilinmasdan turib amalga oshiriladi.
+
+Qanday ishlatiladi?
+Hujjatlar ro'yxati random.shuffle() qilinadi va so'ngra train_docs, val_docs = docs[:split], docs[split:] ko'rinishida bo'linadi. 
+
+Analogiya
+Imtihon savollari. Imtihondan oldin talabaga test savollarining yarmini ko'rsatib, so'ng xuddi shu savollardan imtihon olish leakage hisoblanadi.
+
+
+Binary Storage (uint16) & np.memmap Qism B: Dataset Builder va Binary Format 
+
+Token IDlarni xotirani tejash uchun uint16 formatida diskka yozish va training paytida ularni RAMga yuklamasdan o'qish (memory-map).
+Memory-map - katta datasetni diskda saqlagan holda, kerakli qismlarini RAM orqali tez o‘qish usuli.operatsion tizim faylning kerakli qismini xotiraga olib keladi. Keyin boshqa qism kerak bo‘lsa, o‘sha qism olinadi. Bu ayniqsa LLM trainingda katta .bin token fayllari bilan ishlaganda RAMni tejaydi.
+
+Milliardlab tokenlarni oddiy matn yoki katta array sifatida RAMga yuklab bo'lmaydi, uint16 va memmap xotira yetmasligi muammosini yechadi.
+
+Qayerdai shlatiladi?
+train.bin va val.bin fayllarini yaratishda hamda DataLoader ichida ma'lumot o'qishda ishlatiladi.
+
+Qanday ishlatiladi?
+np.array(ids,dtype=np.uint16).tofile('train.bin') shaklida saqlanib, np.memmap('train.bin', mode='r') bilan o'qiladi.
+
+Analogiya 
+Netflix videosi. Kinoni to'liq kompyuterga yuklab olmasdan, ko'rayotgan qismimizni tarmoqdan stream qilib (uzatib) ko'rish kabidir.
+
+
+Flat Sequence Packing without Padding
+Qism B: Dataset Builder va Binary Format
+Bu degani Hujjatlarni alohida blok qilib emas, balki orasiga <eos> qo'yib, bitta uzun tekis (flat) bir o'lchamli massiv shaklida birlashtirish.
+barcha hujjatlarni EOS bilan ajratib, bitta uzun token oqimiga birlashtirish va undan fixed-length sequence’lar kesib olish; bo‘sh joyni PAD bilan to‘ldirmaslik.
+Bu usulning asosiy foydasi — padding kamayadi, tokenlar isrof bo‘lmaydi va training compute samaraliroq ishlatiladi.GPU ko‘proq haqiqiy training tokenlari ustida ishlaydi.
+PAD token — qisqa sequenceni kerakli uzunlikka yetkazish uchun qo‘shiladigan bo‘sh maxsus token.
+Bu yerda <PAD> hech qanday ma’no bermaydi. U faqat sequence’larning uzunligini tenglashtirish uchun turadi.
+Odatda attention mask orqali modelga:
+Real token → ishlat
+PAD token  → e’tibor bermagin
+deb ko‘rsatiladi.
+PAD token - bo‘sh joy to‘ldiruvchi maxsus token.
+U modelga yangi ma’lumot bermaydi, faqat batchdagi sequence’larni bir xil uzunlikka keltiradi.
+Shuning uchun packing without padding usulida imkon qadar PAD ishlatilmaydi va bo‘sh joyga boshqa haqiqiy tokenlar joylashtiriladi.
+
+<pad> tokenlarini ishlatishga hojat qolmaydi. Hech qaysi token hisoblash jarayonida isrof bo'lmaydi, har bir token foydali training signal beradi. 
+
+Qayerda ishlatiladi?
+Dataset tayyorlash yakunida train.bin yaratilayotganda va batch shakllantirish jarayonida qo'llaniladi.
+
+Qanday ishlatiladi?
+Hujjatlar ketma-ket joylanadi. Block_size o'zgarganda datasetni boshqatdan qurish shart emas, chunki u tekis massiv, batch paytida kesiladi.
+
+Analogiya
+Zavoddagi konveyer lentasi. Har bir mahsulot orasiga chegara(chegara bu <eos>) qo'yilib, uzluksiz ketma-ketlikda bitta lentada harakatlanishi. 
+
+
+Input / Target Shifting
+Qism B: Dataset Builder va Binary Format  
+
+Bu degani Model keyingi tokenni bashorat qilishni o'rganishi uchun X (kirish) va Y (nishon) ma'lumotlarini 1 ta token farqi bilan siljitish. 
+Input va Target Shifting — bu modelga hozirgi tokenlardan keyingi tokenni bashorat qilishni o‘rgatish usuli.
+Masalan matn:
+Men AI ni yaxshi ko‘raman
+Tokenlar soddalashtirib:
+[Men] [AI] [ni] [yaxshi] [ko‘raman]
+qismlariga bolinadi.
+Trainingda bundan ikkita ketma-ketlik qilinadi:
+Input:
+[Men] [AI] [ni] [yaxshi]
+
+Target:
+[AI] [ni] [yaxshi] [ko‘raman]
+Ya’ni Target Inputdan 1 token chapga surilgan bo‘ladi.
+
+Oqim:
+Original tokenlar
+↓
+Input = tokenlarning oxirgisidan tashqari qismi
+Target = tokenlarning birinchisidan tashqari qismi
+↓
+Model prediction
+↓
+Target bilan solishtirish
+↓
+Loss hisoblanadi 
+↓
+Backpropagation
+
+Input = model ko‘radigan tokenlar.
+Target = model keyingi token sifatida topishi kerak bo‘lgan javoblar.
+Shifting = Targetni Inputga nisbatan 1 token surish.
+Bu GPT kabi causal language modellarning asosiy next-token prediction training usulidir.
+
+Causal Language Modeling asosi. T uzunlikdagi ketma-ketlikdan model 1 ta emas, balki bir vaqtning o'zida T ta training signal (loss) hisoblaydi. 
+
+Qayerda ishlatiladi?
+Training siklidagi DataLoader batch yaratish qismida: x = tokens[i:i+T], y = tokens[i+1:i+T+1]. 
+
+Qanday ishlatiladi?
+PyTorch orqali indekslar tasodifiy olinadi (torch.randint) va x hamda y massivlari 1 pozitsiya farq bilan kesib olinadi. 
+
+Analogiya
+Karaoke ekrani. Ekranda hozir aytilayotgan so'z (input) va undan keyingi keladigan va xonanda ko'zi bilan qidirayotgan so'z (target) siljishi.
