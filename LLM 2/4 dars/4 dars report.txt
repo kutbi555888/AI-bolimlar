@@ -1,0 +1,255 @@
+[10/20/2026 11:04 AM] .: 4 dars
+
+Repository structurada quyidagilar bolishi kerak:
+.gitignore
+(Git'ga yuklanmasligi kerak bo‘lgan fayl va papkalarni belgilaydi)
+
+README.md
+(Loyihaning umumiy maqsadi, o‘rnatish va foydalanish tartibini tushuntiradi)
+
+MODEL_CARD.md
+(Model haqida ma’lumot beradi: arxitektura, training, imkoniyatlar va cheklovlar)
+
+configs/data.yaml
+(Dataset va data pipeline sozlamalarini saqlaydi)
+
+Data/Dataset_Card.md
+(Datasetning manbasi, tarkibi, license'i, sifati va cheklovlarini tushuntiradi)
+
+Muhim ikkita qoida
+1.Data va checkpoint Git'ga hech qachon tushmaydi — faqat ularni qayta yaratadigan kod tushadi
+ 2.Har bir run o'z config fayligа ega — turli xil xolatlarni taqqoslash uchun , qayta tiklash uchun ishlatilinadi.
+
+Dataset_Card.md ichida datasetga oid malumotlar yoziladi masalan:
+# TinyStories Dataset Card
+
+| Field | Value |
+|---|---|
+| Dataset | TinyStories V2 |
+| Source | roneneldan/TinyStories |
+| File | TinyStoriesV2-GPT4-train.txt |
+| Size | 2.23 GB |
+| Language | English |
+| Type | Synthetic children's stories |
+| Documents | 2,717,661 |
+| Characters | 2,226,845,268 |
+| Estimated Tokens | ~556.7M |
+| Estimated Model Size | ~28M parameters |
+| Local Path | C:/llm-data/tinystories/ |
+
+data.yaml bilan farqi nima?
+Dataset_Card.md — odam o‘qishi uchun hujjat.
+configs/data.yaml esa kod o‘qishi uchun konfiguratsiya.
+
+Masalan data.yaml:
+dataset:
+  name: TinyStories
+  source: roneneldan/TinyStories
+  language: en
+
+paths:
+  raw: C:/llm-data/tinystories/
+
+training:
+  estimated_tokens: 556700000
+
+
+1.Cleaning bosqichi
+
+HTML / markup — tag, script, style, navigatsiya 
+Unicode NFKC — bir xil belgi bir xil ko'rinishga keltiriladi 
+Whitespace — ketma-ket bo'shliq va bo'sh qatorlarni siqish 
+Mojibake — noto'g'ri encoding natijasi (Ã©, â€™) tuzatiladi 
+Control characters — ko'rinmas belgilar olib tashlanadi 
+Bo'sh, kesilgan, strukturaviy buzilgan hujjatlar → drop 
+
+Savol
+Cookie banner korpusdagi hujjatlarning 40 %ida uchraydi. Model bundan nimani o'rganadi?
+Javob
+Cookie banner ko‘p bo‘lsa, model “internetda cookie banner juda muhim va juda tez-tez uchraydigan til patterni” deb o‘rganadi. Bu foydali signal emas, shuning uchun pre-trainingdan oldin olib tashlash ma’qul.
+
+
+2.Filtering bosqichi
+
+1.Language ID — confidence threshold
+Hujjat qaysi tilda yozilganini aniqlaydi. Ishonchlilik darajasi past bo‘lsa, hujjat noto‘g‘ri til yoki aralash matn deb filtrlab tashlanadi.
+2.Length bounds — juda qisqa va juda uzun hujjatlar
+Hujjat uzunligiga chegara qo‘yiladi. Juda qisqa matn foydasiz bo‘lishi, juda uzun matn esa scraping xatosi yoki ortiqcha kontent bo‘lishi mumkin.
+3.Mean word length — o‘rtacha so‘z uzunligi
+Hujjatdagi so‘zlarning o‘rtacha uzunligini tekshiradi. Juda g‘alati qiymat chiqsa, matn buzilgan, kod, random belgilar yoki spam bo‘lishi mumkin.
+4.Alphabetic ratio — harflar ulushi
+Matndagi harflar sonini raqam, belgi va boshqa simvollar bilan solishtiradi. Harflar juda kam bo‘lsa, bu normal matn emas, balki kod, jadval yoki axlat data bo‘lishi mumkin.
+5.Punctuation ending ratio — tinish belgisi bilan tugash ulushi
+Qatorlarning nechta qismi ., ?, ! kabi belgilar bilan tugashini tekshiradi. Juda past bo‘lsa, matn fragmentlar, menyu yoki buzilgan sahifa bo‘lishi mumkin.
+6.Repeated-line ratio — takrorlangan qatorlar ulushi
+Bitta hujjat ichida bir xil qatorlar necha marta takrorlanganini o‘lchaydi. Ko‘p takror bo‘lsa, banner, footer, spam yoki scraping xatosi bo‘lishi mumkin.
+7.Repeated n-gram ratio — takrorlangan so‘z ketma-ketliklari
+Bir xil 2–5 ta so‘zdan iborat patternlar qayta-qayta uchrayaptimi, shuni tekshiradi. Ko‘p takror SEO spam yoki shablon matn belgisi bo‘lishi mumkin.
+8.Blocklist — qora ro‘yxat
+Oldindan ma’lum bo‘lgan spam domenlar, zararli saytlar yoki keraksiz patternlar ro‘yxati. Mos tushgan hujjatlar avtomatik chiqarib tashlanadi.
+[10/20/2026 11:04 AM] .: Har bir threshold ikki tomonga xato qiladi:
+1.Qattiq threshold — juda qat’iy filter
+Chegara juda qattiq bo‘lsa, yaxshi data ham chiqib ketadi. Masalan dialekt, kam uchraydigan mavzu yoki qisqa, lekin foydali matnlar yo‘qolishi mumkin.
+2.Yumshoq threshold — juda bo‘sh filter
+Chegara juda yumshoq bo‘lsa, keraksiz data ichkarida qoladi. Masalan spam, takroriy, shovqinli yoki toksik matnlar training corpusga kirib ketishi mumkin.
+3.Yechim — o‘lchangan threshold
+Maqsad “eng qattiq” yoki “eng yumshoq” chegara emas. Threshold real datasetda test qilinib, qancha yaxshi data yo‘qolyapti va qancha yomon data qolayotgani o‘lchanib tanlanadi.
+
+Savol
+Language detector bitta hujjatga 0.6 confidence berdi. Qoldirasizmi yoki tashlaysizmi?
+0.6 confidenceni ko‘rib darrov tashlamayman ham, qoldirmayman ham. Chunki 0.6 — detector faqat 60% ishonch bilan tilni aniqladi degani.
+0.6  bu gray zone yani noaniq oraliq; avval boshqa quality signallar bilan tekshirib, keyin qaror qilamiz.
+Masalan:
+matn uzunligi normalmi?
+harflar yetarlimi?
+juda ko‘p raqam yoki belgilar yo‘qmi?
+bir xil qatorlar takrorlanmaganmi?
+spamga o‘xshamayaptimi?
+Agar shu tekshiruvlar yaxshi chiqsa  hujjatni qoldiramiz.
+Agar ko‘pi yomon chiqsa tashlaymiz.
+
+Yoki:
+uni darhol o‘chirish o‘rniga:
+Confidence ≥ 0.8
+Qoldirish 
+
+Confidence 0.5–0.8
+Shubhali / qo‘shimcha tekshirish 
+
+Confidence < 0.5
+Tashlash 
+Shunday qilamiz
+
+
+3. Deduplication 
+
+Exact deduplication — bu aynan bir xil bo‘lgan hujjatlarni topish va bittasini qoldirib, qolgan nusxalarni olib tashlash usuli.Exact deduplication 100% bir xil nusxalarni topadi.O‘xshash, lekin biroz farqli matnlar uchun esa near-duplicate deduplication kerak bo‘ladi.
+
+LLM dataset cleaningda duplicate hujjat darajasida topiladi, lekin gap yoki matn bo‘lagi darajasida ham topish mumkin.
+Masalan:
+1.Document-level deduplication → butun hujjat bir xilmi, tekshiradi.
+2.Sentence/line-level deduplication → bir xil gap yoki qatorlar takrorlanganmi, tekshiradi.
+3.n-gram / near-duplicate deduplication → matnning katta qismi o‘xshashmi, hatto aynan bir xil bo‘lmasa ham tekshiradi.
+
+Duplicate hujjatlarni topishda Hashing usuli yordam beradi.Hashing bu hujjatning raqamli qiymati,izi yoki hujjatning barmoq izi desak ham boladi.
+Agar matn aynan bir xil bo‘lsa, hash ham bir xil chiqadi.Shuning uchun duplicate topishda juda qulay.Lekin hash juda sezgir.faqat bitta bo‘shliq bilan farq qilsa ham, hash butunlay boshqa chiqishi mumkin.Dublikatlarni tez topish uchun hujjatlarning o‘zini emas, hash qiymatlari solishtiriladi.agar hashlar bir xil bolsa duplicate boladi.agar bir xil bolmasa boshqa hujjat boladi.Duplicate qilishdan oldin Normalizitsiya qilish kerak.chunki hash matndagi juda kichik farqni ham boshqa qiymat deb qabul qiladi.agar normalizatsiya qilinmasa hash kichkina bir farq korsa ham boshqa hujjat deydi.shuning uchun hashlashdan oldin Normalizitsiya qilinsa ikkala matn ham bir xil ko‘rinishga keladi.Masalan ortiqcha bo‘shliqlar olib tashlanadi, ba’zan katta-kichik harflar bir xil ko‘rinishga keltiriladi va keraksiz formatlar tozalanadi.endi matn bir xil standard holatga keldi.endi hash olinsa, hashlar ham bir xil chiqadi va tizim ularni duplicate deb topa oladi.
+
+
+Near-duplicate — bu matnlar 100% bir xil emas, lekin juda katta qismi bir xil yoki juda o‘xshash bo‘lgan holat.
+Exact duplicate 100% bir xil.
+Near-duplicate deyarli bir xil, faqat ozgina farqi bor.
+Near-duplicate topish uchun oddiy hashning o‘zi yetmaydi, chunki kichik o‘zgarish ham hashni butunlay o‘zgartiradi. Shu sababli n-gram, Jaccard similarity, MinHash yoki SimHash kabi usullar ishlatiladi.
+
+Near-duplicate topishning bir usulining ketma-ket pipelinesi:
+
+1.Shingles — hujjatni ketma-ket kelgan kichik so‘z guruhlariga, ya’ni n-gramlarga bo‘ladi. Shu orqali matnning qaysi qismlari o‘xshashligini tekshirish osonlashadi.
+[10/20/2026 11:04 AM] .: 2.MinHash — shu katta n-gram to‘plamini kichik imzo (signature) ga siqadi. O‘xshash hujjatlarning imzolari ham odatda o‘xshash bo‘ladi.
+3.LSH — o‘xshash imzolarni bir xil bucketga yig‘adi. Keyin faqat shu guruh ichidagi hujjatlar batafsil solishtiriladi.
+Natija — millionlab hujjatlarning barcha juftlarini tekshirmasdan, near-duplicate hujjatlarni ancha tez topish mumkin.
+
+Savol
+Bitta hujjat korpusda 50 marta uchraydi. Training paytida loss bilan nima sodir bo'ladi?
+Javob
+Agar bitta hujjat korpusda 50 marta takrorlansa, model training paytida o‘sha matnni 50 marta ko‘radi.
+Natijada o‘sha hujjat uchun loss tezroq kamayadi, chunki model uning tokenlarini asta-sekin yodlab oladi va keyingi tokenlarni osonroq bashorat qiladi. Lekin bu yaxshi narsa emas. umumiy training loss sun’iy ravishda pastroq ko‘rinishi mumkin, chunki model bir xil ma’lumotni qayta-qayta oson yechyapti.
+Model uni ortiqcha o‘rganadi,yodlaydi
+Training loss yaxshi ko‘rinadi
+lekin generalization yomonlashishi mumkin.
+duplicate data modelga yangi bilim bermaydi, faqat ayrim hujjatlarning trainingdagi og‘irligini sun’iy ravishda oshiradi.
+
+
+PII scrubbing bu dataset ichidagi shaxsni aniqlash mumkin bo‘lgan maxfiy ma’lumotlarni topish va olib tashlash yoki yashirish jarayoni yoki shaxsiy ma’lumotlarni datasetdan tozalash yoki anonimlashtirishdir.
+PII ga odatda ism, telefon raqami, email, uy manzili, ID/passport raqami, bank ma’lumoti kabi ma’lumotlar kiradi.
+
+PII scrubbingni 3ta usuli bor:
+1. Reduction - agar datada shaxsiy malumotlar bolsa butunlay ochirib yuboriladi
+2. Anonymization - datadagi shaxsiy malumotlarni ozini umumiy ismi yoziladi.Masalan:
+934583398 - [PHONE]
+Jasur - [NAME]
+Salom.gmail.com - [EMAIL]
+Seul - [ADDRESS]
+shunday qilib yoziladi
+3. Pseudonymization - datadagi shaxsiy ma'lumotlarni orniga fake,soxta ism yoziladi. Masalan:
+934583398 - [123456789]
+Jasur - [Alex]
+Saloh.gmail.com - [kuchukcha.gmail.com]
+Shunday qilib hammasiga soxta ism yozib chiqiladi.
+
+Shunda model shaxsiy malumotlarni organmaydi,bilmaydi.kimdir modeldan shaxsiy malumot sorasa ham beraman desa ham shaxsiy malumot yoq boladi.albatta bundan oldin Alignment kabi ishlar qilingan boladi
+
+Savol
+Safety filtri toksik matnni kesadi. Bu bilan birga yana nima kesilib ketishi mumkin?
+Javob
+Safety filtri faqat haqiqiy toksik matnni emas, zararli so‘zlar kontekstda foydali ishlatilgan matnlarni ham kesib yuborishi mumkin.
+Masalan:
+tarixiy hujjat yoki yangiliklarda zo‘ravonlik haqida neytral bayon;
+ilmiy maqolada hate speech yoki ekstremizmni tahlil qilish;
+tibbiy yoki jinsiy salomatlik matnlari;
+badiiy asardagi qo‘pol dialog;
+toksik gapni misol qilib keltirgan “bu noto‘g‘ri” mazmundagi matn.
+Shuning uchun juda qattiq safety filter ishlatilsa, datasetdan foydali, kontekstli va ta’limiy ma’lumotlar ham yo‘qolib ketishi mumkin. Ya’ni bu ham threshold muammosi: juda qattiq filter → false positive ko‘payadi.yani yaxshi matnni xato qilib yomon deb topishi kop boladi.
+Agar juda qattiq threshold qoyilsa yaxshi matnlarni kopi kesilib ketishi mumkin.
+
+
+Statistics report — dataset yoki training jarayoni haqida raqamlar bilan qisqa hisobot.Masalan dataset uchun u shuni ko‘rsatishi mumkin:
+Jami hujjatlar: 1,000,000
+Tozalangandan keyin: 820,000
+Duplicate olib tashlandi: 120,000
+PII topildi: 5,000
+O‘rtacha hujjat uzunligi: 850 token
+Inglizcha hujjatlar: 92%
+Ya’ni datasetda qancha data bor, qancha olib tashlandi va sifat ko‘rsatkichlari qanday
+ekanini ko‘rsatadi.
+
+
+Hisobotda nimalar bolishi shart bular:
+
+1.Raw
+Bu hali tozalanmagan, dastlabki dataset holati. Hisobotda jami hujjatlar soni, belgilar soni va fayl hajmi (MB/GB) yoziladi. Bu boshlang‘ich nuqta bo‘ladi, keyingi bosqichlar bilan solishtirish uchun kerak.
+2.Cleaning
+Bu bosqichda HTML, keraksiz belgilar, cookie banner, footer, bo‘sh qatorlar kabi ortiqcha qismlar tozalanadi. Hisobotda qancha hujjat kirdi, qancha chiqdi va nima sababdan o‘chirildi degan raqamlar yoziladi.
+[10/20/2026 11:04 AM] .: 3.Filtering
+Bu yerda language ID, length, alphabetic ratio, repeated-line kabi filterlar ishlaydi. Hisobotda har bir filter nechta hujjatni olib tashlagani alohida ko‘rsatiladi. Shunda qaysi filter eng ko‘p data kesayotganini ko‘rish mumkin.
+4.Deduplication
+Datasetdagi takroriy hujjatlar topilib olib tashlanadi. Hisobotda exact duplicate soni va near-duplicate soni alohida yoziladi. Bu model bir xil matnni qayta-qayta ko‘rmasligi uchun kerak.
+5.PII
+Bu bosqichda email, telefon, manzil, ID kabi shaxsiy ma’lumotlar aniqlanadi. Hisobotda har bir PII pattern bo‘yicha nechta moslik topilgani yoziladi. Masalan: email — 1200 ta, telefon — 500 ta.
+6.Final
+Bu barcha cleaning, filtering, deduplication va PII tozalashdan keyingi yakuniy dataset. Hisobotda yakuniy hujjatlar soni, belgilar soni va taxminiy token soni yoziladi. Ana shu final corpus modelni train qilishga beriladi.
+
+Pipeline — ma’lumotni tozalash va tayyorlash uchun ishlatiladigan jarayon/vosita. Masalan cleaning, filtering, deduplication, PII removal — bular pipeline bosqichlari.
+Raqamlar — shu pipeline ishlagandan keyin olingan natija. Masalan nechta hujjat o‘chirildi, nechta duplicate topildi, finalda nechta token qoldi — mana shu raqamlar bizning haqiqiy mahsulotimiz, ya’ni o‘lchanadigan natija.
+
+
+prepare_data.py — bu raw datasetni model train qilishga tayyorlaydigan Python script.
+Odatda u quyidagi ishlarni bajaradi:
+Raw datani o‘qiydi.
+Cleaning qiladi — HTML, ortiqcha bo‘shliq, keraksiz belgilarni tozalaydi.
+Filtering qiladi — juda qisqa, noto‘g‘ri til, spam matnlarni chiqaradi.
+Deduplication qiladi — duplicate va near-duplicate matnlarni olib tashlaydi.
+PII yoki xavfli ma’lumotlarni tozalaydi.
+Yakuniy datasetni kerakli formatda, masalan .jsonl, .txt yoki .parquet qilib saqlaydi.
+Statistics report chiqarishi ham mumkin — nechta hujjat qoldi, qancha drop bo‘ldi, taxminiy token soni va hokazo.
+Ya’ni prepare_data.py datani modelga berishdan oldingi data tayyorlash skriptidir.
+
+
+configs/data.yaml — bu dataset va data pipeline sozlamalarini saqlaydigan konfiguratsiya fayli.
+Masalan unda shunday ma’lumotlar bo‘lishi mumkin:
+dataset_name: TinyStories
+language: en
+raw_path: data/raw/
+output_path: data/processed/
+
+min_length: 100
+max_length: 5000
+language_threshold: 0.8
+remove_duplicates: true
+Bu yerda prepare_data.py shu faylni o‘qib, qaysi datasetni ishlatish, qayerdan olish, qayerga saqlash va qaysi thresholdlar bilan tozalash kerakligini biladi.
+Thresholdlar kodda emas shu configni ichida boladi
+
+
+Darsni Oxirida bizda bolishi kerak bolgan narsalar:
+1.our-llm/ strukturasi va ikkita Git qoidasi amalda
+2.data/raw/ ichida real fayl
+3.Bitta raqam: taxminiy final token soni 4.prepare_data.py — bitta buyruq bilan ishlaydi 
+5.stats_report.md — har bosqich uchun raqamlar bilan
