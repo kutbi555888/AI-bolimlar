@@ -1,0 +1,200 @@
+Basic savollar
+
+1. Pre-training va post-training farqi nima? Har bir bosqichda modelda nima o'zgaradi?Qaysi biri koproq data talab qiladi?​
+Training va Pre-training aynan bir xil narsa emas.Training — bu umumiy tushuncha. Modelni weightlarini data yordamida o‘zgartirishning barcha jarayonlari training hisoblanadi.
+Pre-training esa trainingning birinchi va eng katta bosqichi. Bu bosqichda model juda katta raw text corpusda odatda next-token prediction orqali tilni, grammatikani, faktlarni va patternlarni o‘rganadi.
+keyin:
+2.Base Model keyin
+3.POST-TRAINING
+   SFT
+   DPO / RLHF
+   Safety tuning keyin
+4.Chat / Instruct Model
+TRAINING - modelni o‘qitishning umumiy nomi
+PRE-TRAINING - modelni boshidan katta corpusda o‘qitish bosqichi
+Albatta Pre-training bosqichida koproq data talab qilinadi
+
+2. Common Crawlni to'g'ridan-to'g'ri training uchun ishlatib bo'lmaydi. Nega?
+Chunki Common Crawl bu filtrlanmagan,tozalanmagan data. butun internetni web datalari
+
+3. FineWeb nima va u Common Crawl'dan qanday olingan?​
+FineWeb bu ComonCrawlni tozalangan variant
+
+4. LLM loyihasida .gitignore ichida nima bo'lishi kerak va nega?​
+LLM loyihasida asosan .gitignore Ichida:
+model
+model chekpointlari
+dataset
+weightlar
+Python virtual environment
+Cache fayllari
+Log fayllari
+Training natijalari
+Maxfiy ma'lumotlar
+Operatsion tizim fayllari kabilar bolishi kerak
+
+5. API kalit yoki token GitHub repositoryga tushib qolsa nima qilasiz?​
+API kalitni darhol bekor qilaman (Revoke qilaman) chunki kalitni boshqa odamlar ko‘rib, mening nomimdan API xizmatlaridan foydalanishi mumkin. Eng birinchi vazifa — eski kalitni ishlamaydigan qilish.
+Yangi API kalit yarataman (Rotate).
+Eski kalit o‘rniga yangisini yarataman va loyihamni yangi kalit bilan ishlaydigan qilib sozlayman.
+Maxfiy kalitni repositorydan olib tashlayman.Kalitni koddan o‘chiraman. Agar u Git tarixiga ham yozilgan bo‘lsa, tarixdan ham tozalayman. Lekin tarixni tozalash eski kalitni xavfsiz qilmaydi, shuning uchun uni bekor qilish albatta shart
+Kalitni .env faylida saqlayman. API kalitni to‘g‘ridan-to‘g‘ri Python kodiga yozmayman, balki .env yoki maxfiy kalitlarni boshqarish tizimida saqlayman.
+.env faylini .gitignorega qo‘shaman. Shunda Git kelajakda ushbu faylni tasodifan repositoryga qo‘shmaydi.
+API foydalanish tarixini tekshiraman. Kalitdan begona odamlar foydalanganmi, shubhali so‘rovlar yoki ortiqcha xarajatlar yuzaga kelganmi — tekshiraman. Kerak bo‘lsa, boshqa bog‘liq kalitlarni ham yangilayman.
+Eng muhimi: API kalit internetga chiqib ketgan bo‘lsa, uni faqat GitHubdan o‘chirish yetarli emas. Albatta bekor qilish kerak, chunki kimdir uni allaqachon nusxalab olgan bo‘lishi mumkin.
+
+6. Pre-training uchun nega CPU emas, GPU ishlatiladi? Nima uchun GPU LLM da kerak?Nima uchun Vs code + Google colab
+chunki CPUni katta data bolsa ishlatib bolmaydi chunki CPU GPU kabi tez Parallel hisob kitob ishlarini qila olmaydi, vaqt juda juda kop ketadi. GPU LLMda kerakligini sababi LLMda data juda katta boladi, hisob kitob ishlarini tezroq amalga oshirish kerak boladi.
+​Nima uchun Vs code + Google colab? chunki Google colabni ozida modelni train qilish saqlash ishlari qiyinroq. colabda bazi bir funksiyalar yoq va colabni tushunish qiyinroq. lekin tushunsa bir amallab ishlatsa boladi. Vs code + Google colab bolsa vs Code faqat monitor vazifasini bajarib turadi,kodlar esa Colabni serverida run boladi. Yani vs Code Colabni serveriga ulanadi. bu holatda ishlatish esa juda ham qulay va tushunarli
+
+7. Data mixture nima va nega bitta dataset yetarli emas?​
+Data mixture bu masalan biz LLM model yaratyabmiz. LLM model yaratganimizda bizga 1ta turdagi datani ozi yetarli bolmaydi.bizga turli xil turdagi datalar kerak boladi. biz maqsadimizga qarab datalarni tanlab, taqsimlab , foizlarga ajratib keyin modelni shu mixture qilingan datalar bilan orgatish data mixturedir.nega bitta dataset yetarli emas. chunki bitta turdagi data modelni organishi uchun yetmaydi, model yaxshi organmaydi,modelga turli ilmlar kerak, turli ilmlar esa turli datalardir. model shu maqsadga qarab tanlangan turli ilmlarni organsa yaxshi organadi va yaxshi model boladi.
+
+8. Deduplication nima va nega training'dan oldin qilinadi?​
+Deduplication bu takrorlangan malumotlarni olib tashlab keyin trainga berishdir. chunki trainingdan oldin qilinmasa takror malumotlar ni model kop organib overfitting bolishi bias bolishi mumkin.model kerakli malumotlarni organmasdan bir xil malumotni organib kop narsa organmasligi mumkin. yana takror malumotlar bu ortiqcha xarajat ham keltirib chiqaradi.
+
+9. Nega ko'proq data avtomatik ravishda yaxshiroq modelni anglatmaydi?​
+chunki koproq data bilan train qilindi degani model yaxshi chiqadi degani emas. data filtrlanmasdan , data mixture qilinmasdan bir uyum musir data bilan model oqitilsa model ham shu dataga yarasha model bolib chiqadi.
+
+10. MIT litsenziyali dataset ustida model o'rgatsangiz, sizdan nima talab qilinadi?​
+Agar MIT litsenziyali dataset ustida LLM modelini o‘qitsam, quyidagilarga e’tibor beraman:
+1. Mualliflik huquqini saqlash (Copyright Notice)
+Datasetning asl muallifi yoki tashkiloti haqidagi copyright ma’lumotlarini saqlayman.
+2. Litsenziya matnini saqlash (License Notice)
+Agar datasetning nusxasini yoki katta qismini qayta tarqatsam, asl MIT litsenziyasi va copyright bildirishnomasini ham qo‘shaman. Bu MIT litsenziyasining asosiy talabidir.
+3. Dataset manbasini ko‘rsatish (Attribution)
+Dataset_Card.md yoki MODEL_CARD.md ichida dataset nomi, muallifi, manbasi va litsenziyasini yozaman. Bu model qanday ma’lumotlarda o‘qitilganini hujjatlashtirishga yordam beradi.
+4. Tijoriy foydalanish (Commercial Use)
+MIT litsenziyasi datasetdan tijoriy maqsadlarda foydalanish, o‘zgartirish va qayta tarqatishga odatda ruxsat beradi. Lekin dataset tarkibidagi ma’lumotlarga boshqa huquqiy cheklovlar qo‘llanilmasligini ham tekshiraman.
+5. Model litsenziyasini alohida belgilash
+Faqat MIT datasetda training qilishning o‘zi model weightlari ham avtomatik MIT litsenziyali bo‘lishini anglatmaydi.
+MIT litsenziyali datasetda model o‘qitish mumkin. Asosiy talab — datasetni qayta tarqatganda asl copyright va litsenziya bildirishnomalarini saqlash. Dataset manbasini Model Card yoki Dataset Card’da ko‘rsatish ham yaxshi amaliyot hisoblanadi.
+
+
+Intermediate savollar
+
+11. Coding'ga yo'naltirilgan LLM uchun data mixture tuzing va har bir foizni asoslang.​
+
+Coding LLM uchun quyidagi Data Mixtureni tanlagan bo‘lardim:
+ 
+№	Data turi	                                                                                                          Foiz                                 Vazifasi
+1	Source Code — Dastur kodlari		                                                        50%                             Kod yozishni o‘rgatish
+2	Technical Documentation — Texnik hujjatlar	                                             15%                                Kutubxona va APIlarni tushunish
+3	Unit Tests & Debugging — Test va xatolar		                                    10%                                 Xatolarni aniqlash va tuzatish
+4	Programming Tutorials & Q&A — Dasturlash darslari va savol-javoblar	      10%	                        Kodni tushuntirish va muammolarni yechish
+5	General Text — Umumiy matnlar	                                                                 10%                                     Tabiiy tilni tushunish
+6	Mathematics & Logic — Matematika va mantiq		                                     5%                                     Algoritmik fikrlashni rivojlantirish
+	JAMI	100%	 
+
+
+12.   Compute sarflashdan oldin korpus sifatini qanday o'lchaysiz?​
+       Compute sarflashdan oldin korpus sifatini hujjatlar soni, tokenlar miqdori, language confidence, text quality, duplicate ratio, spam, PII, safety va data mixture ko‘rsatkichlari orqali o‘lchayman. Keyin korpusdan namunalar olib qo‘lda tekshiraman va barcha natijalarni Statistics Report’da saqlayman. Shu orqali sifatsiz ma’lumotlar ulushini kamaytirib, GPU resurslarini foydaliroq training ma’lumotlariga sarflashga harakat qilaman. Eng muhimi: Korpusning sifati faqat uning hajmi bilan emas, balki qanchalik foydali, toza, xilma-xil va model maqsadiga mos ekanligi bilan o‘lchanadi.
+
+
+13. Qattiq filtratsiya va data hajmini saqlash o'rtasidagi trade-off nimada?​
+Qattiq filtratsiya dataset sifatini oshirishi mumkin, lekin foydali ma’lumotlarni ham olib tashlab, data hajmini kamaytiradi. Yumshoq filtratsiya esa ko‘proq ma’lumotni saqlaydi, lekin sifatsiz matnlar ham qolishi mumkin. Shuning uchun filter thresholdlarini statistik tahlil, qo‘lda tekshirish va kichik training tajribalari asosida tanlab, sifat va hajm o‘rtasida muvozanat saqlash kerak.
+
+14. Web korpusda benchmark leakage (test contamination) ni qanday aniqlaysiz?​
+Benchmark Leakage (Test Contamination) — bu modelni baholash uchun ishlatiladigan test savollari yoki javoblarining training datasetga tushib qolishi.
+Web korpusda benchmark leakage’ni aniqlash uchun benchmark savollari va javoblarini training dataset bilan solishtiraman. Exact matching, n-gram matching, MinHash va LSH kabi usullar yordamida bir xil yoki o‘xshash matnlarni topaman. Shubhali hujjatlarni qo‘lda tekshirib, tasdiqlangan test ma’lumotlarini training korpusdan olib tashlayman. Natijalarni Statistics Report’da qayd etaman.
+maqsad: model test savollarini oldindan yodlab olmasligi va evaluation natijalari uning haqiqiy qobiliyatini ko‘rsatishi.
+agar model allaqachon ifloslangan korpusda o‘qitilgan bo‘lsa, keyinchalik datasetdan test savollarini o‘chirish model o‘rgangan ma’lumotlarni avtomatik yo‘qotmaydi. Bunday holatda yangi, mustaqil testlardan foydalanish kerak bo‘lishi mumkin.
+
+15. Exact va fuzzy (MinHash/LSH) dedup — qachon qaysi biri?​
+Exact Deduplication — aynan bir xil hujjatlarni topadi.
+Fuzzy Deduplication — to‘liq bir xil bo‘lmasa ham, juda o‘xshash hujjatlarni topadi.
+1. Exact Deduplication — Qachon ishlatiladi?
+Datasetda 100% bir xil hujjatlarni topish va olib tashlash kerak bo‘lganda ishlatiladi.
+2. Fuzzy Deduplication (MinHash/LSH) — Qachon ishlatiladi?
+Datasetda biroz farq qiladigan, lekin katta qismi bir xil hujjatlar ko‘p bo‘lsa ishlatiladi.
+
+16. Datasetning 80% ingliz tilida, mahsulot esa o'zbek tilidagi foydalanuvchilar uchun. Nima qilasiz?​
+1chi yol
+60% Uzbek tili 40% ingliz tili qilish
+2chi yol
+40% ingliz 40% Uzbek va 20% ingliz tilidan tarjima qilingan Uzbek tili data yoki boshqa tilni qoshish
+3chi yol
+60% Uzbek 20% ingliz 20% boshqa til(misol rus tili)
+
+17. Qanday safety va PII filtratsiyasini qo'llaysiz va overfiltering xavfi nimada?
+Gitignore xavfsizlik mexanizimi ? Nimaga?
+LLM datasetida Safety Filtering orqali spam, zararli va toksik matnlarni aniqlayman, PII Filtering orqali esa telefon, email, manzil va boshqa shaxsiy ma’lumotlarni aniqlayman. PII Scrubbing yordamida ularni o‘chiraman yoki yashiraman. Overfiltering xavfi shundaki, juda qattiq filtrlar foydali hujjatlarni ham xato olib tashlashi mumkin. Shuning uchun filtratsiyani kontekst, threshold va qo‘lda tekshirish asosida muvozanatlashtiraman.
+Gitignore xavfsizlik mexanizimi ? Nimaga?
+.gitignore to‘liq xavfsizlik mexanizmi emas, balki Git repositoryga keraksiz va maxfiy fayllarning tasodifan qo‘shilishining oldini olishga yordam beradigan vositadir. U API key, token, dataset va checkpointlarni ignore qilish orqali xavfsizlik xavfini kamaytiradi. Lekin fayllarni shifrlamaydi va Git tarixiga allaqachon tushgan ma’lumotlarni himoya qilmaydi. Shuning uchun .gitignore bilan birga secret manager, access control va secret scanning kabi qo‘shimcha xavfsizlik choralaridan foydalanish kerak.
+
+18. Pre-training data va post-training (SFT/preference) data qanday farq qiladi?​
+Asosiy farqi: Pre-training data modelga tilni, bilimlarni va matn qonuniyatlarini o‘rgatadi. Post-training data esa modelga foydalanuvchi savollariga qanday javob berish, ko‘rsatmalarga amal qilish va yaxshiroq javobni tanlashni o‘rgatadi.
+1. Pre-training Data — Dastlabki o‘qitish ma’lumotlari
+Vazifasi: modelga til, grammatika, faktlar, dasturlash va boshqa bilimlarni o‘rgatish.
+Pre-training uchun odatda katta hajmdagi oddiy matnlar ishlatiladi.
+Masalan:
+Kitoblar va maqolalar.
+Wikipedia va web sahifalar.
+Ilmiy hujjatlar.
+Dasturlash kodlari.
+Texnik hujjatlar.
+2. SFT Data — Supervised Fine-Tuning ma’lumotlari
+Vazifasi: base modelga foydalanuvchi ko‘rsatmalariga amal qilishni va tushunarli javob berishni o‘rgatish.
+SFT uchun oddiy matn emas, ko‘pincha Instruction → Response formatidagi ma’lumotlar ishlatiladi.
+Masalan:
+Instruction:
+Python list nima?
+Response:
+List — Python dasturlash tilida
+bir nechta qiymatlarni tartibli
+saqlash uchun ishlatiladigan
+ma'lumotlar tuzilmasi.
+Model quyidagilarni o‘rganadi:
+Foydalanuvchi savoli
+        ↓
+Ko‘rsatmani tushunish
+        ↓
+To‘g‘ri va tushunarli javob yozish
+
+SFTda ham odatda next-token prediction va loss ishlatiladi. Farqi — model foydalanuvchi ko‘rsatmasiga mos javob yozishga o‘rgatiladi.
+Natija: Instruction-following Model yaratiladi
+
+3. Preference Data — Afzallik ma’lumotlari
+Vazifasi: modelga bir nechta javob orasidan qaysi biri yaxshiroq ekanini o‘rgatish.
+Preference datasetda odatda bitta savolga ikkita javob beriladi.
+Masalan:
+Prompt:
+Machine Learning nima?
+Chosen Response:
+Machine Learning — kompyuterning
+ma'lumotlardan qonuniyatlarni
+o‘rganish usuli.
+
+Rejected Response:
+Machine Learning — kompyuterga
+tegishli biror texnologiya.
+Bu yerda:
+Chosen — afzal ko‘rilgan, yaxshiroq javob.
+Rejected — unga nisbatan yomonroq javob.
+Model DPO kabi usullar yordamida yaxshi javoblarni afzal ko‘rishga o‘rgatiladi. RLHF usulida esa preference ma’lumotlari reward modelni o‘qitishda ishlatilishi mumkin.
+Natija: Yaxshiroq moslashtirilgan (Aligned) Model yaratiladi
+Pre-training: Model nimani bilishi kerak?
+SFT: Model qanday javob berishi kerak?
+Preference: Model qaysi javobni afzal ko‘rishi kerak?
+
+
+19. Repo'da 200GB data va 40GB checkpoint bor. Buni Git'siz qanday versiyalaysiz?​
+200 GB dataset va 40 GB checkpointni Git repositoryga yuklamayman. Datasetni AWS S3 yoki Google Cloud Storage'da versiyalar bilan saqlayman. Checkpointlarni esa MLflow yoki W&B Artifacts orqali boshqaraman. Har bir versiyaga ID, hash va metadata biriktiraman. Shunda qaysi dataset va konfiguratsiyada model o‘qitilganini aniqlash, oldingi versiyaga qaytish hamda trainingni checkpointdan davom ettirish mumkin bo‘ladi.
+Git - Kod versiyalarini boshqarish
+Cloud Storage - Katta dataset va checkpointlarni saqlash
+Artifact Versioning - Dataset va checkpoint versiyalarini boshqarish
+Metadata + Hash - Versiyalarni aniqlash va tekshirish
+
+20. Dataset CC-BY-NC litsenziyasida. Uni commercial modelda ishlata olasizmi?​
+1. CC BY-NC nimani anglatadi?
+CC — Creative Commons (litsenziya turi).
+BY — Attribution (asl muallif va manbani ko‘rsatish majburiy).
+NC — NonCommercial (tijoriy maqsadda foydalanish taqiqlangan).
+CC BY-NC litsenziyali datasetni commercial LLM trainingida faqat shu litsenziyaga tayanib ishlatmayman, chunki NC tijoriy foydalanishni cheklaydi. Avval muallifdan tijoriy foydalanish uchun alohida ruxsat olaman yoki commercial foydalanishga ruxsat beradigan boshqa dataset tanlayman. Shuningdek, amaldagi qonunchilikdagi istisnolarni tekshiraman.
+
+
+
+
+
+
+​
