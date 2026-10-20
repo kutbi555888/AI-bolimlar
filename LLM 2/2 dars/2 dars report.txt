@@ -1,0 +1,652 @@
+[10/20/2026 10:59 AM] .: 2 dars
+
+.gitignore nima?
+Bu githubga push qilinmaydigan fayllar royxatidir.nega bazi fayllar push qilinmaydi.chunki githubga yuklash uchun limit berilgan shu limitdan oshsa fayllarni push qilib bolmaydi.git lfs ham borku lekin bu ham bir sabab.keyin bazi fayllar juda katta xotira oladi,bazilari esa kerak emas,faqat kodlar bazi natijalar,bazan modelni ham yuklab qoyish mumkin agar katta bolmasa.
+LLMda nega .gitignore kerak.LLMda juda katta xotira oladigan model weightlar boladi, dataset juda katta boladi, tokenlar ham juda katta joy oladi, API key lar yuklanib ketsa bundan boshqa odam notogri maqsadda foydalanish mumkin.
+
+Endi SML va LLMdagi .gitignore ni taqqoslaymiz:
+SML
+1.SMLdagi fayl hajmlari juda katta bolmaydi.tasodifan gitga push bolib ketsa ham git buni oson boshqaradi
+2.SML da kichkina datasetlar jamoaviy ishlash uchun ataylab gitni ichida saqlanadi
+2. Agar kichkina SML model sizib chiqsa ham moliyaviy zarar odatda kam boladi.chunki uni yana CPUda train qilmoqchi bolsak bir necha daqiqa yoki soat ketishi mumkin
+
+LLM
+1.Agar LLM weight fayllari tasodifan gitga push qilib yuborilsa Git tarixini buzishi va terminaldagi sync jarayonini qotirib qo‘yishi mumkin.chunki LLM weight fayllari o‘nlab yoki yuzlab GB bo‘lishi mumkin.
+2.LLM datasetlari ko‘pincha terabaytlab raw text bo‘ladi. Ularni Gitdan ignore qilish va tashqi storage orqali boshqarish kerak.
+3.Agar hali alignment qilinmagan base LLM weightlari SFT/RLHF tugashidan oldin sizib chiqsa, raqobatchilar millionlab dollar sarflangan training natijasini qo‘lga kiritishi mumkin.
+
+
+LLMda model yasashda Data Source lar juda muhim. Muhim data source larni aytsam bular:
+Data Sources :General Purpose uchun
+1. Common Crawl :  https://commoncrawl.org/ 
+ 2.Hugging Face : https://huggingface.co/datasets/HuggingFaceFW/fineweb 3.Dolma : https://github.com/allenai/dolma
+
+
+Misol uchun biz SLM yasamoqchi bolsak 1chi qanaqa LLM yasamoqchimiz shuni aniqlashtirib olishimiz kerak.keyin shunga qarab data  tanlanadi.
+1.General SLM bolsa FineWeb yuqori sifatli tozalangan dataset. Common Crawl ni tozalangani
+2. Education SLM bolsa FineWeb- Edu talimga oid malumotlar bor
+3.Coding SLM bolsa The Stack v2 programming codelar bor
+4. Scientific(ilmiy) SLM bolsa arXiv academic maqola,ilmiy malumotlar , search tadqiqotlar bor
+
+
+Kichkina SML model yasash
+
+Albatta. Kichkina SLM model uchun sodda decoder-only Transformer arxitekturasi.
+Masalan kichik model konfiguratsiyasi:
+Vocabulary size = 8,000
+Hidden dimension = 128
+Transformer layers = 4
+Attention heads = 4
+MLP hidden size = 512
+Context length = 1024
+Taxminan 1–2 million parametr atrofidagi juda kichik model
+1. INPUT TEXT
+   (Kirish matni — modelga berilgan matn)
+
+   Misol:
+   "The cat is sitting"
+
+↓
+
+2. TOKENIZER
+   (Matnni kichik tokenlarga ajratadi)
+
+   Misol:
+   "The cat is sitting"
+        ↓
+   ["The", " cat", " is", " sitting"]
+
+↓
+
+3. TOKEN IDs
+   (Har bir tokenni vocabulary ichidagi integer ID ga aylantiradi)
+
+   Misol:
+   ["The", " cat", " is", " sitting"]
+        ↓
+   [45, 781, 32, 1902]
+
+↓
+
+4. TOKEN EMBEDDING
+   (Har bir integer Token ID uchun o‘rganiladigan float vectorni embedding jadvalidan oladi)
+
+   Misol:
+   Token ID = 781
+        ↓
+   [0.12, -0.41, 0.83, ...]
+        ↓
+   128 ta float
+
+   Shape:
+   [Batch, Sequence, 128]
+
+↓
+
+5. POSITION INFORMATION / RoPE
+   (Tokenning gap ichidagi pozitsiyasini modelga bildiradi)
+
+   Misol:
+   "cat" qaysi joyda turganini model biladi:
+   position 0, 1, 2, 3 ...
+
+↓
+
+6. TRANSFORMER BLOCK × 4
+   (Token representationlarini kontekstga qarab qayta ishlaydi)
+
+   ┌─────────────────────────────────────┐
+   │ 6.1 RMSNorm                        │
+   │ (Hidden qiymatlarni normallashtiradi,│
+   │ trainingni barqaror qiladi)        │
+   │                                     │
+   │ ↓                                   │
+[10/20/2026 10:59 AM] .: │                                     │
+   │ 6.2 CAUSAL SELF-ATTENTION          │
+   │ (Har bir token oldingi tokenlardan │
+   │ kerakli ma’lumotni oladi)          │
+   │                                     │
+   │    ├─ Q Projection                 │
+   │    │  (Nimani qidiryapman?)        │
+   │    │                                │
+   │    ├─ K Projection                 │
+   │    │  (Menda qanday ma’lumot bor?) │
+   │    │                                │
+   │    ├─ V Projection                 │
+   │    │  (Qanday ma’lumot uzatiladi?) │
+   │    │                                │
+   │    ├─ RoPE                         │
+   │    │  (Q va K ga pozitsiya         │
+   │    │   ma’lumotini qo‘shadi)       │
+   │    │                                │
+   │    ├─ Causal Mask                  │
+   │    │  (Kelajakdagi tokenlarni      │
+   │    │   ko‘rishni taqiqlaydi)       │
+   │    │                                │
+   │    └─ Attention Output             │
+   │       (Kontekstdan yig‘ilgan       │
+   │        yangi ma’lumot)             │
+   │                                     │
+   │ ↓                                   │
+   │                                     │
+   │ 6.3 RESIDUAL CONNECTION            │
+   │ (Eski hidden state'ni attention    │
+   │ natijasiga qo‘shadi, ma’lumotni    │
+   │ saqlashga yordam beradi)           │
+   │                                     │
+   │ x = x + Attention(x)               │
+   │                                     │
+   │ ↓                                   │
+   │                                     │
+   │ 6.4 RMSNorm                        │
+   │ (MLP oldidan yana normallashtiradi)│
+   │                                     │
+   │ ↓                                   │
+   │                                     │
+   │ 6.5 MLP / FEED-FORWARD             │
+   │ (Har bir token representationini   │
+   │ ichkaridan kuchliroq qayta ishlaydi)│
+   │                                     │
+   │ 128 → 512 → 128                    │
+   │                                     │
+   │    ├─ Up Projection                │
+   │    │  (Dimensionni kattalashtiradi)│
+   │    │                                │
+   │    ├─ Activation / SwiGLU          │
+   │    │  (Non-linearity qo‘shadi)     │
+   │    │                                │
+   │    └─ Down Projection              │
+   │       (Yana hidden size 128 ga     │
+   │        qaytaradi)                  │
+   │                                     │
+   │ ↓                                   │
+   │                                     │
+   │ 6.6 RESIDUAL CONNECTION            │
+   │ (Oldingi representation bilan MLP  │
+   │ natijasini qo‘shadi)               │
+   │                                     │
+   │ x = x + MLP(x)                     │
+   └─────────────────────────────────────┘
+
+          × 4 layer
+
+↓
+
+7. FINAL RMSNorm
+   (Oxirgi Transformer layerdan chiqqan hidden state'larni normallashtiradi)
+
+↓
+
+8. LM HEAD
+   (128-dimensional hidden vectorni butun vocabulary uchun score'larga aylantiradi)
+
+   Masalan:
+
+   128
+    ↓
+   8,000 vocabulary scores
+
+↓
+
+9. LOGITS
+   (Har bir mumkin bo‘lgan token uchun raw score chiqaradi; hali probability emas)
+
+   Misol:
+
+   "on"     = 7.4
+   "under"  = 5.2
+   "table"  = 2.1
+   "apple"  = -1.7
+   ...
+
+↓
+
+10. SOFTMAX
+    (Logitlarni probabilitylarga aylantiradi)
+
+    Misol:
+
+    "on"      0.62
+    "under"   0.18
+    "near"    0.09
+    ...
+
+↓
+
+11. TOKEN SELECTION
+    (Keyingi tokenni tanlaydi)
+
+    Masalan:
+    ├─ Greedy
+    ├─ Temperature
+    ├─ Top-k
+    └─ Top-p
+
+↓
+
+12. NEXT TOKEN
+    (Tanlangan keyingi tokenni outputga qo‘shadi)
+
+    Misol:
+
+    Input:
+    "The cat is sitting"
+
+    Next token:
+    " on"
+
+    Natija:
+    "The cat is sitting on"
+
+↓
+
+13. AUTOREGRESSIVE LOOP
+    (Yangi tokenni inputga qo‘shib, jarayonni yana takrorlaydi)
+
+    "The cat is sitting"
+             ↓
+    "The cat is sitting on"
+             ↓
+    "The cat is sitting on the"
+             ↓
+    "The cat is sitting on the mat"
+             ↓
+    EOS
+[10/20/2026 10:59 AM] .: Eng qisqa arxitektura:
+INPUT TEXT
+↓
+TOKENIZER
+↓
+TOKEN IDs
+↓
+TOKEN EMBEDDING
+↓
+POSITION / RoPE
+↓
+TRANSFORMER BLOCK × N
+   ├─ RMSNorm
+   ├─ Causal Self-Attention
+   │   ├─ Q
+   │   ├─ K
+   │   ├─ V
+   │   ├─ RoPE
+   │   └─ Causal Mask
+   ├─ Residual
+   ├─ RMSNorm
+   ├─ MLP / SwiGLU
+   └─ Residual
+↓
+FINAL RMSNorm
+↓
+LM HEAD
+↓
+LOGITS
+↓
+SOFTMAX
+↓
+TOKEN SELECTION
+↓
+NEXT TOKEN
+↓
+REPEAT
+
+Pre-training, SFT, DPO/RLHF va Deployment arxitekturaning layerlari emas. Yuqoridagi 1–13 — modelning ichki forward/generation architecturesi. Pre-training va post-training esa shu arxitekturadagi weightlarni o‘rgatadigan alohida training bosqichlaridir.
+
+
+Quality dimension 
+Modelni katta dataset bilan train qildi degani har doim ham yaxshi model boladi degani emas.chunki dataset katta bolsa ham toza bolmasa model yaxshi model bolmaydi.
+Common crawl ni tozalab clean,filter qilib, deduplicate qilib FineWeb holiga keltirish yetarlimi.yoq data toza va yaxshi bolishi uchun yana boshqa narsalar ham bor. Data yaxshi bolishi uchun dataga turli xil savollar berib korishimiz kerak.
+
+Quality Dimensions — bu ma’lumot yoki datasetning sifatini baholash uchun ishlatiladigan asosiy mezonlar.
+Ya’ni savol shunday:
+“Bu data qanchalik yaxshi?”
+Bunga faqat bitta mezon bilan emas, bir nechta o‘lchov bilan javob beriladi. Shu o‘lchovlar quality dimensions deyiladi.
+Masalan LLM datasetida eng ko‘p uchraydiganlari:
+Accuracy — ma’lumot qanchalik to‘g‘ri?
+Completeness — ma’lumot yetarlimi yoki nimadir yetishmayaptimi?
+Consistency — bir joydagi ma’lumot boshqa joy bilan zid emasmi?
+Relevance — taskga aloqadormi?
+Diversity — ma’lumotlar xilma-xilmi?
+Uniqueness — duplicate ko‘p emasmi?
+Timeliness / Freshness — ma’lumot eskirib qolmaganmi?
+Validity — format va qoidalarga mosmi?
+Balance — class yoki mavzular juda notekis taqsimlanmaganmi?
+Mana shu savollarning har biri alohida quality dimension hisoblanadi.
+
+1. Relevance (Moslik)
+→Data modelning maqsadiga mosmi?
+
+2. Quality (Sifat)
+ Matn to‘g‘ri, tushunarli va yaxshi yozilganmi?
+
+3. Diversity (Xilma-xillik)
+ Datasetda turli manba, mavzu va uslublar bormi?
+
+quality dimension tuzilishi
+Data Quality
+1. Relevance
+2. Quality
+3. Diversity
+
+Quality
+1. Accuracy 
+2. Safety / Toxicity
+3. Deduplication
+4. PII / Privacy
+
+Quality Dimensions: Safety, Integrity & Filtering Dimensions
+(Sifat o‘lchovlari: Xavfsizlik, ishonchlilik va filtrlash o‘lchovlari)
+
+4. Accuracy / Factual Quality (Aniqlik / Faktlarning sifati) - Internetda xatolar mavjud bo‘lgani sababli, matndagi ma’lumotlarning haqiqatga mosligini tekshirish.
+5. Safety / Toxicity (Xavfsizlik / Zararli kontent) - Zararli, xavfli yoki yomon maqsadli kontentni aniqlash va filtrlab tashlash.
+6. Duplication (Takrorlanish / Dublikatlar) - Datasetdagi qayta-qayta uchraydigan hujjatlarni topish va olib tashlash orqali ortiqcha takrorlanishni kamaytirish.
+7. PII / Sensitivity (Shaxsiy ma’lumotlar / Maxfiylik) - Personally Identifiable Information (PII) — shaxsni aniqlash mumkin bo‘lgan ma’lumotlarning modelga sizib kirishidan himoya qilish.
+
+4. Accuracy / Factual Quality
+→Ma’lumot haqiqatga mosmi?
+
+5. Safety / Toxicity
+→Zararli yoki xavfli kontent bormi?
+
+6. Duplication
+Bir xil ma’lumotlar qayta-qayta takrorlanmaganmi?
+
+7. PII / Sensitivity
+→ Shaxsiy yoki maxfiy ma’lumotlar datasetga kirib qolmaganmi?
+
+Data Mixture - modelni sohaga,maqsadga qarab turli xil ma'lumotlarni sohaga moslab taqsimlash va keyin train qilish
+SMLda model faqat bir turdagi data bilan train qilinar edi lekin LLMda turli xil datalar kerak.chunki bu til modeli.
+
+
+Data Mixture
+Source 
+Domain, soha
+Taqsimlash foizi
+
+FineWeb
+Web
+50%
+
+FineWeb-Edu
+Education
+15%
+
+arXiv
+Science
+10%
+
+Wikipedia
+Reference
+10%
+
+Code dataset
+Programming
+10%
+
+Books/public-domain text
+Books
+5%
+
+Mixed Corpus
+Tokenizer
+Training 
+
+Mana shunday qilib maqsadga qarab taqsimlash data mixture deyiladi
+[10/20/2026 10:59 AM] .: Nega data mixture qilinadi. Chunki turli xil datasetlar turli ilm hisoblanadi.
+turli data manbalari modelga turli qobiliyatlarni o‘rgatadi.
+Ya’ni Web umumiy tilni, Books uzun matn va boy lug‘atni, Wikipedia faktik bilimni, Science ilmiy fikrlashni, Code esa dasturlash mantig‘i va sintaksisini o‘rgatishga yordam beradi.
+
+Data Mixture ≠ Random Combination
+Bu degani data manbalarini shunchaki tasodifiy aralashtirish bu xato.
+Web      = 90%
+Code     = 5%
+Science  = 5%
+Bu dataset bilan umumiy maqsadli model qilish mumkin lekin
+“Agar biz coding LLM qilmoqchi bo‘lsak, Code data atigi 5% bo‘lishi yetarlimi?”
+Javob ko‘pincha yo‘q yoki juda kam bo‘lishi mumkin. Chunki modelning maqsadi coding bo‘lsa, training datasetda kodga oid data ulushi ham yetarlicha katta bo‘lishi kerak.
+Masalan umumiy generla purpose LLM uchun:
+Web        50%
+Books      15%
+Wikipedia  10%
+Science    10%
+Code       10%
+Other       5%
+mantiqli bo‘lishi mumkin.
+Lekin coding model uchun:
+Code        40%
+Web         25%
+Technical   15%
+Science     10%
+Books        5%
+Other        5%
+kabi boshqa mixture kerak bo‘lishi mumkin.
+
+data mixture = model-design decision Bu degani Data mixture ham model dizaynining bir qismi degani
+Ya’ni faqat layer soni,hidden size,attention heads,model parameters emas, balki modelga maqsadga qarab data tanlash ham model dizaynining bir qismidir.mana shular ham modelni qanday chiqishini belgilaydi.
+Demak Qanday model xohlasak, dataset aralashmasini ham shunga mos tanlashimiz kerak.
+Coding LLM uchun code data ko‘proq, ilmiy LLM uchun science data ko‘proq, umumiy LLM uchun esa data mixture kengroq va balansli bo‘ladi.
+
+Masalan Korean-English bilingual LLM qurmoqchi bolsak 
+English = 80%
+Korean  = 10%
+Code    = 10%
+Corpusni shunday qilsak model koproq ingliz tilini organadi va ingliz tiliga mos model boladi. Agar shu datasetni o‘z holicha random sampling bilan train qilsak, model training davomida ingliz tilini juda ko‘p, koreys tilini esa juda kam ko‘radi. Agar
+English = 40%
+Korean  = 40%
+Code    = 20%
+Deliberate Data Weighting / Sampling
+Data ulushlarini ataylab sozlasak / sampling qilsak English ham Korean ham teng boladi yoki English kamroq tanlanib Korean koproq tanlanadi.
+Bu yerda original datasetning o‘zi:
+80% English
+10% Korean
+10% Code
+bo‘lishi mumkin, lekin training vaqtida sampling orqali modelga:
+40% English
+40% Korean
+20% Code
+nisbatda data beriladi.
+Ya’ni Korean data ko‘proq qayta tanlanadi, English esa nisbatan kamroq olinadi.
+Training data taqsimoti modelning xulqi va qobiliyatlariga bevosita ta’sir qiladi.bu juda muhim fikr.
+
+
+License 
+
+LLMda License (litsenziya) — bu dataset, kod yoki modeldan qanday shartlarda foydalanish mumkinligini belgilaydigan huquqiy ruxsat yoki qonuniy ravishda qanday ishlatish mumkinligini belgilaydigan qoidalar to‘plami.
+Yanada aniqrogi License Bu narsani ishlatishga ruxsat bormi va qanday shartlar bilan? degani
+LLM loyihasida odatda 3 xil litsenziyaga qaraladi:
+Turi
+Nimaga tegishli?
+Misol:
+Dataset License
+Training data
+CC BY, CC0, CC BY-NC
+
+Code License
+Model kodi / repository
+MIT, Apache 2.0, GPL
+
+Model License
+Model weights
+Apache 2.0, custom license
+
+Agar data haqiqatan ozimizniki bo‘lsa, odatda litsenziyani bizga alohida davlat idorasi bermaydi. Mualliflik yoki boshqa huquq egasi sifatida o‘zimiz foydalanish shartlarini tanlaymiz va datasetga litsenziya biriktiramiz.
+Eng muhim savol: “Men boshqalarga nima qilishga ruxsat bermoqchiman?”
+
+Bizning xohishimiz
+Mos kelishi mumkin bo‘lgan litsenziya
+
+Istagancha ishlatsin, eng erkin bo‘lsin
+CC0
+Ishlatsin, lekin sizni manba sifatida ko‘rsatsin
+CC BY 4.0
+O‘zgartirib tarqatsa, xuddi shu litsenziyada tarqatsin
+CC BY-SA 4.0
+Tijoratda ishlatmasin
+CC BY-NC 4.0
+Database huquqlariga alohida e’tibor kerak
+ODC-BY / ODbL kabi database litsenziyalari
+
+Licenze bor Copyrightni ro'yxatdan otkazish bor bu ikkalasi boshqa tushunchalar.
+[10/20/2026 10:59 AM] .: Copyrightni ro‘yxatdan o‘tkazish — o‘zingiz yaratgan asar yoki kontentga bo‘lgan mualliflik huquqingizni tegishli tashkilotda rasmiy qayd ettirish degani.
+Muhim farq: ko‘p davlatlarda copyright asar yaratilgan zahoti avtomatik paydo bo‘ladi. Ya’ni kitob yozdingiz, kod yaratdingiz, original dataset tuzdingiz — mualliflik huquqi uchun avval sertifikat olish shart emas. Ro‘yxatdan o‘tkazish esa shu huquqni rasmiy hujjat bilan mustahkamlashga yordam beradi.
+Copyright registration — “Bu original asarning huquq egasi menman” degan huquqni rasmiy qaydda mustahkamlash jarayoni.
+Boshqalarga datasetni ishlatishga ruxsat bu License.
+
+COPYRIGHT
+Bu asarning huquq egasi kim?
+LICENSE
+Huquq egasi boshqalarga undan qanday foydalanishga ruxsat beradi?
+Mana shu savollar bu ikkalsiga javob beradi.
+
+biror datasetni LLM training uchun ishlatishdan oldin aynan shu savollar ketma-ket tekshirilishi kerak
+License (Litsenziya)
+
+Who created it?
+(Buni kim yaratgan?)
+
+Where did the data come from?
+(Ma’lumot qayerdan kelgan?)
+
+What license applies?
+(Qaysi litsenziya qo‘llaniladi?)
+
+What are the conditions?
+(Shartlari qanday?)
+
+Can I modify it?
+(Men uni o‘zgartira olamanmi?)
+
+Can I redistribute it?
+(Men uni qayta tarqata olamanmi?)
+
+Can I use it commercially?
+(Men undan tijoriy maqsadda foydalana olamanmi?)
+
+Are there additional upstream terms?
+(Asl manbadan keladigan qo‘shimcha shartlar bormi?)
+
+datasetni LLM training uchun ishlatishdan oldin litsenziyani mana shu checklist bo‘yicha tekshirish kerak.
+DATASET LICENSE CHECK
+(Dataset litsenziyasini tekshirish)
+What is the license?
+  (Litsenziya qaysi?)
+
+Who owns/produced the dataset?
+  (Dataset kimga tegishli / uni kim yaratgan?)
+
+What are we allowed to do?
+  (Bizga nimalar qilishga ruxsat berilgan?)
+
+  (Simpler version of multiple conditions)
+  (Bir nechta shartlarning soddalashtirilgan ko‘rinishi)
+
+
+Eng muhimlari quyidagi 3ta. Ayniqsa shu 3tani tekshirish kerak
+1. Is commercial use allowed?
+  (Tijoriy maqsadda foydalanishga ruxsat bormi?)
+
+2. Is redistribution allowed?
+  (Qayta tarqatishga ruxsat bormi?)
+
+
+3. Is attribution required?
+  (Muallif yoki manbani ko‘rsatish talab qilinadimi?)
+
+Are there additional restrictions?
+  (Qo‘shimcha cheklovlar bormi?)
+
+Data Lineage bu data qayerdan kelganini kuzatib borish.
+litsenziya ma’lumotini ikki xil ko‘rinishda yozish mumkin: birinchisi kompyuter o‘qiydigan YAML metadata, ikkinchisi esa odam o‘qishi uchun Human-readable licensing notice.
+
+Misol:
+License (YAML) — Litsenziya (YAML)
+
+datasets:
+  - username/mit-licensed-dataset
+(Ishlatilgan dataset nomi/manzili)
+
+license: mit
+(Litsenziya: MIT)
+
+tags:
+  - code-generation
+ (Teg: kod generatsiyasi)
+
+Bu qism, masalan Hugging Face’ga model joylaganimizda, tizimga qaysi dataset ishlatilgani, model/dataset litsenziyasi va model qaysi turga tegishli ekanini bildiradi
+
+Human-readable qismda esa odamga batafsil tushuntiradi:
+“Men bu modelni mana bu datasetda train qildim. Dataset MIT License ostida. Asl mualliflik ma’lumoti mana bu.” kabi tushuntirib yoziladi.
+
+Quyidagilar License turlari va nimalarga ruxsat berishi haqida:
+
+1.License (Litsenziya)
+2.Commercial? (Tijoriy foydalanish?)
+3.Modify? (O‘zgartirish?)
+4.Redistribute? (Qayta tarqatish?)
+
+CC0
+Ha
+Ha
+Ha
+
+CC BY
+Ha
+Ha
+Ha
+
+CC BY-SA
+Ha
+Ha
+Ha
+
+CC BY-NC
+Yo‘q
+Ha
+Shartlarga bog‘liq
+
+CC BY-NC-SA
+Yo‘q
+Ha
+Shartlarga bog‘liq
+
+CC BY-ND
+Ha
+Shartlarga bog‘liq
+Shartlarga bog‘liq
+
+CC BY-NC-ND
+Yo‘q
+Shartlarga bog‘liq
+Shartlarga bog‘liq
+
+ODC-By
+Ha
+Ha
+Ha
+
+ODbL
+Ha
+Ha
+Shartlarga bog‘liq
+
+MIT
+Ha
+Ha
+Ha
+
+Apache-2.0
+Ha
+Ha
+Ha
+
+BSD-3
+Ha
+Ha
+Ha
+
+GPL-3.0
+Ha
+Ha
+Shartlarga bog‘liq
+
+Realni loyihada yana boshqa shartlari ham tekshiriladi.bu soddaroq korinishidir.
