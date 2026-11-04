@@ -1,0 +1,179 @@
+10 dars
+
+Fine Tuning (Supervised Fine Tuning) Post-training ni ichida
+
+Teskari teorema 
+Loss kopayib ketgani uchun weightlar notugri boldimi yoki weightlar notugri bolgani uchun loss kopayib ketdimi
+ 
+Training tushunchasini AI ning turli sohlarida turlicha tushunsa boladi. Masalan LLMda faqat modelni oqitish emas balki modelni parametrlarini o'zgartirish orqali uning bashoratlarini tobora yaxshilash jarayoni deb tushunsak boladi.
+
+Training fundamentals 
+LLM Fundamentals degani — katta til modellarining qanday tuzilishi, qanday ishlashi, qanday o‘qitilishi va qanday qilib matn yaratishini tushunish uchun zarur bo‘lgan asosiy nazariy va amaliy bilimlar majmuasi degani.
+
+LLM Fundamentals da bilish kerak bolgan narsalar:
+1. AI, Machine Learning, Deep Learning va NLP asoslari
+2. Matematika va neyron tarmoqlar asoslari
+3. Data Preparation, Tokenization va Embedding
+4. Transformer Architecture
+5. Attention Mechanisms va ularning turlari
+6. Feed-Forward Network (FFN), Normalization va Residual Connections
+7. Model Design, Architecture va Configuration
+8. Pre-training, Loss Function, Backpropagation va Optimization
+9. Post-training, Supervised Fine-Tuning (SFT) va Alignment
+10. Inference, Decoding Strategies va Text Generation
+11. Model Evaluation, Testing va Performance Metrics
+12. Model Optimization, Deployment va Serving
+
+Supervised bilan Self Supervised ni farqi bor.
+Supervised Learning — modelga kirish ma’lumoti(input) va unga mos to‘g‘ri javob(target) oldindan beriladi. Bu javoblar odatda inson tomonidan belgilangan yoki tashqi manbadan olingan bo‘ladi. Aniqrogi biz modelga savolni ham, to‘g‘ri javobni ham beramiz. Model shu javob asosida o‘rganadi.
+Self-Supervised Learningda esa — model o‘rganadigan vazifa va uning to‘g‘ri javobi ma’lumotning o‘zidan avtomatik hosil qilinadi. Inson har bir misol uchun alohida label yozishi shart emas. Aniqrogi model matnning bir qismini ko‘radi va qolgan qismini topishga urinadi. To‘g‘ri javob matnning o‘zida mavjud.
+Ikkalasida ham model bashorat qiladi, xatosini hisoblaydi va parametrlarini yangilaydi.
+Model matnlardan avtomatik ravishda keyingi tokenlarni target qilib oladi. Inson har bir matnga alohida label yozmaydi.GPT matnni bir pozitsiyaga siljitib, keyingi tokenlarni target sifatida oladi.
+BERT uslubidagi modellar esa ayrim tokenlarni yashirib, ularning asl qiymatini bashorat qilishni o‘rganishi mumkin.
+Misol Gpt:
+Input                  Target
+I                           Love
+I love                   AI
+I love AI
+
+Endi yana bitta organish turi ham bor bu:
+Unsupervised Learning — bu modelga oldindan belgilangan to‘g‘ri javoblar (label) berilmasdan, ma’lumotlarning ichidagi yashirin qonuniyatlar, o‘xshashliklar, guruhlar va tuzilmalarni aniqlashga qaratilgan Machine Learning usuli.modelga oldindan belgilangan javoblar berilmaydi; u ma’lumotlardagi o‘xshashliklar va yashirin tuzilmani o‘rganadi.
+O‘zbekchasi: nazoratsiz o‘rganish.
+
+Loss 
+Loss bu haqiqiy javob bilan modelni javobi qiyoslanib model haqiqiy javobga   yaqin javob bersa loss past boladi. Agar modelni javobi haqiqiy javobdan uzoq bolsa loss baland boladi va loss foyizlar korinishida korsatiladi.modelning bashorati qanchalik noto‘g‘ri ekanligini matematik son orqali o‘lchaydigan funksiya natijasi. Aniqrogi loss model haqiqiy javobga nisbatan qancha xato qildi shuni olchaydi.
+Loss Function model chiqargan ehtimollar bilan to‘g‘ri targetni solishtirib, bitta xatolik qiymatini hisoblaydi.Keyin shu qiymat yordamida gradientlar hisoblanadi va weightlar yangilanadi.
+Loss modelga uning bashorati qanchalik xato ekanini son bilan ko‘rsatadi; Backpropagation va Optimizer esa shu xatoni kamaytirish uchun model parametrlarini o‘zgartiradi.
+Shunday qilib, model asta-sekin yaxshiroq bashorat qilishni o‘rganadi.
+Yana Lossni shunday deb tushunish ham mumkin Loss bu — modelning to‘g‘ri javobga qanchalik past yoki yuqori ehtimol berganini baholaydigan xatolik o‘lchovi deb tushunish ham mumkin.model togri javobga yuqori ehtimol bergani sari loss pasayib boradi. Aksincha model togri javobga past ehtimol bergani sari loss kotarilib boraveradi.
+Accuracy esa  nechta bashorat to‘g‘ri chiqqanini hisoblaydi.
+LLMda qaysi Loss ishlatiladi?
+GPT kabi ko‘plab autoregressive til modellarida asosiy o‘qitish maqsadi uchun Cross-Entropy Loss ishlatiladi.
+Cross-Entropy Loss bu — model bashorat qilgan ehtimollar to‘g‘ri javobga qanchalik mosligini baholovchi matematik funksiya.
+
+Training Loop — bu Machine Learning (mashinaviy o‘rganish) yoki Deep Learning (chuqur o‘rganish) modelini o‘qitish jarayonida bir xil amallarni qayta-qayta bajaradigan o‘qitish siklidir.
+
+Aniqroq qilsak, Training Loop — modelga ma’lumot berish, uning javobini tekshirish, xatosini hisoblash, xatodan o‘rganish va model parametrlarini yangilash jarayonidir.
+Masalan, biz o‘zbek tilidagi LLM (Large Language Model — katta til modeli) yaratyapmiz. Model dastlab so‘zlarni to‘g‘ri bashorat qila olmaydi. Training Loop esa modelni minglab yoki millionlab marta mashq qildirib, keyingi tokenni yaxshiroq bashorat qilishga o‘rgatadi.
+Training Loop qanday ishlaydi?
+1. Batch olinadi
+Datasetdan kichik ma’lumotlar guruhi olinadi
+2. Forward Pass
+Model bashorat qiladi
+3. Loss Calculation
+Bashorat xatosi hisoblanadi
+4. Backward Pass
+Gradientlar hisoblanadi
+5. Optimizer Step
+Modelning vaznlari yangilanadi (misol: AdamW)
+6. Takrorlash
+Keyingi batch bilan yana shu jarayon takrorlanadi
+
+Training Loopning asosiy qismlari:
+1. Data Loading Ma’lumotlarni yuklash
+2. Batch Preparation Ma’lumotlarni guruhlarga ajratish
+3.Forward Pass Model orqali bashorat qilish
+4. Loss Calculation Xatoni hisoblash
+5. Zero Grad Eski gradientlarni tozalash
+6. Backward Pass Gradientlarni hisoblash
+7.Optimizer Step Vaznlarni yangilash
+7 tasi eng asosiy qismlar
+8. Logging Natijalarni yozib borish
+9. Validation Modelni tekshirish
+10. Checkpointing Model holatini saqlash
+
+Learning Rate,o‘rganish tezligi
+Model parametrlarini yangilashdagi qadam kattaligini boshqaradi.modelning vaznlarini (weights) yangilashda foydalaniladigan asosiy parametrdir.
+Learning Rate kattaroq bo‘lsa, bir xil gradientda yangilash qadami kattaroq; kichikroq bo‘lsa, yangilash qadami ham kichikroq bo‘ladi.
+Learning Rate qanday berilishi va qanday boshqarilishiga qarab bir nechta usullari:
+1.Fixed Learning Rate — o‘zgarmas LR.
+O‘qitish davomida Learning Rate bir xil qoladi.Model 1 000 ta step o‘qitilsa ham, Learning Rate 0.001 bo‘lib qoladi.
+2.Scheduled Learning Rate — reja asosida o‘zgaradigan LR. Buncha qadamdan keyin bu LR , buncha qadamdan keyin bu LR qilib belgilanadi
+Learning Rate o‘qitish davomida oldindan belgilangan qoida asosida o‘zgartiriladi.
+3.Adaptive Learning Rate — moslashuvchan LR.o‘zgaruvchan sharoitga moslashuvchi.
+Bu usulda optimizer parametrlar uchun gradientlarning tarixiga qarab turlicha samarali yangilash kattaliklarini hisoblaydi.
+Mashhur adaptive optimizerlar:
+AdaGrad, RMSprop, Adam, AdamW, AdaDelta
+4. Parameter Group Learning Rate — parametr guruhlariga alohida LR
+Modelning turli qatlamlariga har xil Learning Rate berish mumkin.
+
+
+LR Scheduler
+Learning Rate qiymatini o‘qitish davomida qanday o‘zgartirishni boshqaradi.oqitish davomida optimizer ishlatadigan asosiy Learning Rate qiymatini ma’lum qoida asosida o‘zgartiradigan mexanizm.
+Masalan, biz 20 ta epoch o‘qitmoqchimiz.
+Boshlang‘ich Learning Rate 0.001.
+Scheduler yordamida:
+1–5-epoch: 0.001
+6–10-epoch: 0.0005
+11–15-epoch: 0.0001
+16–20-epoch: 0.00001
+kabi jadval tuzish mumkin.
+
+3xil LR Strategiyasi
+1.Fixed LR(Constant) - Fixed LR doimiy qoladi.bitta chiziqda, kotarilmaydi ham tushmaydi ham
+2. Step decay - ma’lum bosqichlarda kamayadi.
+3. Warmup+ Cosine decay - avval ko‘tarilib, keyin silliq pasayadi.
+Shu uchchalasi asosan ishlatiladi.
+Va bularni orasida eng kop ishlatiladigani Warmup + Cosine decay 
+Nima uchun Warmup + Cosine?
+Warmup o‘qitish boshida qadam kattaligini nazorat qilishga yordam beradi. Cosine Decay esa keyingi bosqichlarda LRni silliq kamaytiradi.
+[11/5/2026 1:01 AM] .: Learning Rate Scheduler turlari
+1.Learning Rate o‘zgarmaydi.
+0.001 → 0.001 → 0.001 → 0.001
+2.Step Decay — StepLR
+Learning Rate har ma’lum epoch yoki Scheduler qadami o‘tgandan keyin kamayadi.
+3.MultiStepLR
+StepLRga o‘xshaydi, lekin qaysi bosqichlarda kamayishini alohida belgilanadi.
+4.Exponential Decay — ExponentialLR
+Learning Rate muntazam ravishda bir xil koeffitsiyentga ko‘paytirilib kamayadi.
+5. Linear Decay — LinearLR
+Learning Rate ma’lum vaqt davomida chiziqli, ya’ni bir tekis kamayadi yoki oshadi.
+Masalan:
+0.001 → 0.0008 → 0.0006 → 0.0004 → 0.0002
+Bu strategiya Transformer va NLP (Natural Language Processing — tabiiy tilni qayta ishlash) modellarida ham ishlatiladi.
+6. Cosine Annealing — CosineAnnealingLR
+Learning Rate kosinus nomli matematik funksiya asosida silliq kamayadi.
+Oddiy CosineAnnealingLR Scheduler o‘z-o‘zidan LRni boshidagi yuqori qiymatga qayta ko‘tarmaydi. Buning uchun Warm Restarts varianti mavjud.
+Yani Warmup + Cosine decay 
+7.Warmup Scheduler
+Warmup — o‘qitishning dastlabki bosqichida Learning Rateni kichik qiymatdan boshlab, asta-sekin belgilangan yuqori qiymatgacha oshirish.
+Masalan:
+0.00001 → 0.00005 → 0.0001 → 0.0002 → 0.0003
+Nima uchun kerak?
+O‘qitish boshida model parametrlari hali moslashmagan bo‘lishi mumkin. Birinchi qadamlardanoq katta LR ishlatish o‘qitishni beqarorlashtirishi mumkin.
+Warmup boshlang‘ich qadamlarni ehtiyotkorroq qilishga yordam beradi.
+Warmupning ayrim ko‘rinishlari:
+Linear Warmup — chiziqli oshirish.
+Exponential Warmup — eksponensial oshirish.
+Constant Warmup — ma’lum vaqt kichik LRda qolish, keyin boshqa rejimga o‘tish.
+Warmup odatda asosiy schedulerdan oldin qo‘llanadi. Masalan, Linear Warmup + Cosine Decay.
+8. Cosine Annealing with Warm Restarts
+Bu usulda LR kosinus shaklida kamayadi va ma’lum vaqtdan so‘ng qayta oshiriladi. Cosine decay + warmup 
+
+Odatdagi jarayon qanday davom etadi:
+Forward Pass → Loss → Backward Pass
+Optimizer
+Gradient va LR asosida vaznlarni yangilaydi
+LR Scheduler Keyingi yangilanishlar uchun LRni sozlaydi
+Takrorlanish Keyingi batch yoki optimizer step bilan davom etadi.
+
+
+Qolgan modular structure fayllari
+
+1. configs/run_01.yaml — Modelni o‘qitish sozlamalarini saqlaydi. Learning Rate, Batch Size, Epoch, Optimizer va Scheduler parametrlari shu yerda belgilanadi.
+
+2. src/seed.py — Tasodifiylikni boshqaradi. Tajribalarni bir xil sharoitda takrorlash va modellar natijalarini adolatli solishtirishga yordam beradi.
+
+3. src/lr_schedule.py — Learning Rate qiymatini hisoblaydi va o‘qitish davomida o‘zgartirishni boshqaradi. Warmup va Cosine Decay kabi usullarni amalga oshiradi.
+
+4. src/model.py — Model arxitekturasi va qatlamlarini yaratadi. Shuningdek, AdamW optimizerini sozlash va model parametrlarini guruhlarga ajratish kodlarini o‘z ichiga olishi mumkin.
+
+5. src/checkpoint.py — Model vaznlari, optimizer holati va training qadamlarini saqlaydi. Training to‘xtasa, saqlangan holatdan davom ettirish imkonini beradi.
+
+6. src/train_config.py — YAML fayldagi sozlamalarni o‘qib, Python dasturi ishlata oladigan shaklga keltiradi. Sozlamalarning to‘g‘riligini ham tekshirishi mumkin.
+
+7. src/trainer.py — Training Loopni bajaradi. Forward Pass, Loss, Backward Pass, Optimizer Step va boshqa o‘qitish jarayonlarini boshqaradi.
+
+8. scripts/train.py — Butun training jarayonini ishga tushiradi. Sozlamalar, model va datasetni tayyorlab, trainer.py orqali o‘qitishni boshlaydi yoki davom ettiradi.
+
+train.py trainingni ishga tushiradi, trainer.py esa modelni o‘qitish amallarini bajaradi. Qolgan fayllar ushbu jarayon uchun kerakli sozlamalar va yordamchi funksiyalarni ta’minlaydi.
