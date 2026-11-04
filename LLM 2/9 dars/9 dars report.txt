@@ -1,0 +1,39 @@
+9 dars
+
+NLP - Natural Language Processing
+Sozlar bilan ishlasa NLP
+Raqamlar,jadval bilan ishlasa SML 
+LLM NLP ning bir ichki qismi. NLPning rivojlantirilgan varianti LLMdir.
+NLPda kichikroq loyihalar qilingan.
+NLP rivojlanib LLM boldi va LLMda katta loyihalar qilinish boshlandi.
+
+Supervised Machine Learning da ham input ham output berib orgatiladi
+Self - Supervised da esa har bir output berilmaydi.bu LLMga tegishli. Yani qolda bittta bitta berilmaydi. Kod yoziladi va output ozi yaratiladi va beriladi. Yani modelni oziga ozi input output qiymatlarni yaratadi va beradi
+
+Pre-training da model juda katta data bilan oqitiladi,orgatiladi. General Purpose modellar Pre-training ga mos.
+Post-training da esa keyin shu organgan bilimlari malum sohaga moslanadi. Masalan coding, tibbiyot, yoki boshqa sohalarga moslanadi. Post training da Self Supervised bolmaydi. Lekin Pre-training da Self Supervised boladi.
+
+Transformerlar faqat LLMda qollanilmaydi. Transformerlar AI ni boshqa sohalarida ham qo'llaniladi. Misol uchun Reinforcement Machine Learning  , Computer Vision kabi. Transformerni orqasida NN yani Neural Network turadi. Transformer bu LLM emas, LLM bu Transformer emas.
+
+LLM ham Search qiladi. Retrievel boladi. Semantic Search kabi searchlar bor.Search qilmasa ozidagi bor sozni bir qator qilib chiqarib berib qoyadi.
+
+Hozirgi paytdagi Frontier LLM larni Generative AI deyish mumkin. Chunki ularga topshiriq yoki savol bersa nimadir yaratadi.
+
+Custom LLM - misol uchun chat botlar 
+General Purpose - bunga ChatGpt kabilarni misol qilish mumkin
+
+Transformerni arxitektura turlariga Bert va Gpt bor
+BERT - tushib qolgan sozni toldiradi
+Misol:
+Men AIni koraman bolsa
+Men AIni yaxshi koraman deb toldiradi
+Gpt - soz bor va u sozni davom ettirib ketadi. Bu ChatGPT emas.
+Misol:
+Men AIni yaxshi bolsa
+Men AIni yaxshi koraman deb deb davom ettiradi
+Hozirgi Frontier modellar Arxitekturalarni turli qilib hammasini ishlatadi. Bitta arxitekturani emas.masalan Bertni ham, Gptni ham
+
+Enterprise version 
+LLMni kuchi,ilmi bilan ozini ozi rivojlantirish. Self Improvement 
+
+Hozirda LLM ga AIni turli sohalari qoshilmoqda. Masalan CV, SML, Data Analysis kabi. Va LLM ning orqasida NN(Deep Learning) bor va bu kerak.
