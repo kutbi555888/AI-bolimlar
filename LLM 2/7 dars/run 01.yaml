@@ -1,0 +1,184 @@
+
+# configs/run_01.yaml
+# Vazifasi: GPT arxitekturasi, training, optimizer,
+# Learning Rate Scheduler va ma’lumotlar yo‘llarining sozlamalarini bitta joyda saqlaydi.
+
+
+# =====================================
+# GPT MODEL CONFIGURATION
+# =====================================
+
+model:
+
+  # Tokenizer lug'atidagi tokenlar soni
+  vocab_size: 8000
+
+  # Maksimal tokenlar ketma-ketligi
+  block_size: 1024
+
+  # Transformer bloklari soni
+  n_layer: 6
+
+  # Attention Headlar soni
+  n_head: 8
+
+  # Embedding o'lchami
+  n_embd: 256
+
+  # Feed Forward kengayish koeffitsiyenti
+  ffn_mult: 4
+
+  # Dropout ehtimolligi
+  dropout: 0.1
+
+  # Embedding va LM Head vaznlarini bog'lash
+  tie_weights: true
+
+
+# =====================================
+# TRAINING CONFIGURATION
+# =====================================
+
+training:
+
+  # Epochlar soni
+  epochs: 2
+
+  # Har batchdagi namunalar soni
+  batch_size: 8
+
+  # Gradientlarni yig'ish qadamlari
+  gradient_accumulation_steps: 1
+
+  # Takrorlanuvchanlik uchun seed
+  seed: 42
+
+  # Gradient Clipping chegarasi
+  grad_clip: 1.0
+
+
+# =====================================
+# OPTIMIZER CONFIGURATION
+# =====================================
+
+optimizer:
+
+  name: "adamw"
+
+  # Learning Rate
+  learning_rate: 0.0003
+
+  # Weight Decay
+  weight_decay: 0.01
+
+  # AdamW koeffitsiyentlari
+  betas: [0.9, 0.95]
+
+  # Sonli barqarorlik
+  eps: 0.00000001
+
+
+# =====================================
+# LEARNING RATE SCHEDULER
+# =====================================
+
+scheduler:
+
+  # Warmup + Cosine Decay
+  name: "warmup_cosine"
+
+  # Warmup ulushi
+  warmup_ratio: 0.05
+
+  # Minimum Learning Rate
+  min_lr: 0.00003
+
+
+# =====================================
+# DATA CONFIGURATION
+# =====================================
+
+data:
+
+  train_path: "Data/Processed/train.bin"
+
+  val_path: "Data/Processed/val.bin"
+
+  tokenizer_path: "tokenizer/tokenizer.json"
+
+
+# =====================================
+# CHECKPOINT CONFIGURATION
+# =====================================
+
+checkpoint:
+
+  save_dir: "checkpoints"
+
+  save_every_steps: 500
+
+  save_best_model: true
+
+
+# =====================================
+# LOGGING CONFIGURATION
+# =====================================
+
+logging:
+
+  log_every_steps: 10
+
+  log_file: "results/training.log"
+
+  validation_every_steps: 200
+
+
+
+
+# Bu faylda Python funksiyalari emas, YAML formatidagi parametrlar yoziladi. Training kodi ushbu qiymatlarni o‘qib, o‘z ishini sozlaydi.
+
+# Misol uchun, YAMLda:
+# n_layer: 6
+# n_head: 8
+# n_embd: 256
+
+
+# deb yozsak, ModelConfig shu ma’lumotlarni oladi va design_model.py ular asosida model dizaynini hisoblaydi.
+
+# YAML ichidagi optimizer, scheduler, data, checkpoint va logging bo‘limlari esa keyinchalik Training Loopda ishlatilishi uchun tayyorlangan.
+# Hozirgi design_model.py ulardan faqat training bo‘limining ayrim qiymatlarini chiqaradi.
+
+
+# Uchta fayl qanday birgalikda ishlaydi?
+# configs/run_01.yaml
+#         |
+#         | Sozlamalarni beradi
+#         v
+# src/model_config.py
+#         |
+#         | Parametrlarni tekshiradi
+#         v
+# scripts/design_model.py
+#         |
+#         | Arxitekturani hisoblaydi
+#         v
+# GPT MODEL DESIGN REPORT
+#         |
+#         | Keyinchalik:
+#         v
+# src/model.py
+#         |
+#         v
+# Haqiqiy GPT modeli
+
+
+
+# yana bir boshqa misol:
+# vocab_size: 8000      # Model tushunadigan tokenlar soni
+# block_size: 256      # context_size//Foydalanuvchi berishi mumkin bolgan max token
+# n_embd: 384           # width of the model// vector dimension
+# n_layer: 6            # model chuqurligi
+# n_head: 6             # attention heads (384 / 6 = 64 per head)
+# dropout: 0.1
+# ffn_mult: 4           # feed-forward is 4x wider than n_embd
+# tie_weights: true     # output layer reuses the embedding table

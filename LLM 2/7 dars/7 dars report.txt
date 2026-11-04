@@ -1,0 +1,181 @@
+7 dars
+
+Configuration nima?
+Configuration — modelni yaratishdan va o‘qitishdan oldin unga qanday tuzilish va ishlash qoidalarini tanlashimizdir va modelning tuzilishi, qanday o‘qitilishi va qanday ishlashi uchun oldindan belgilab qo‘yiladigan sozlamalar to‘plamidir
+
+Configurationning asosiy turlari
+
+LLM Configuration(Model va training sozlamalari)
+
+Model Config(Transformer tuzilishi)
+Training Config(Model qanday o‘qitiladi)
+Data Config(Dataset qanday tayyorlanadi)
+Inference Config(Javob qanday generatsiya qilinadi)
+
+ Model Configuration bu modelning arxitekturasini belgilaydi.
+Sozlama
+Misol 
+Ma’nosi
+
+vocab_size 
+8000 
+Tokenizer lug‘ati hajmi
+
+block_size
+256 
+Model bir vaqtda qayta ishlaydigan tokenlar soni
+
+n_layer
+ 4 
+Transformer bloklari soni
+
+n_head 
+4 
+Query Attention headlari soni
+
+n_embd
+ 256 
+Hidden state / Embedding o‘lchami
+
+dropout 
+0.1
+ Trainingda qo‘llanadigan regularizatsiya
+
+ tie_weights
+ True
+Embedding va LM Head bitta umumiy vaznlardan foydalanadi.chunki xotirani tejaydi va parametrlar sonini kamaytiradi.
+
+attention_type 
+"MHA" 
+Attention arxitekturasi
+
+activation
+ "GELU" 
+FFNdagi activation function
+
+
+vocab_size 
+Model tushuna oladigan jami tokenlar soni. <bos> va <eos> bular maxsus tokenlar. bos matnning boshini eos matnning oxirini bildiradi.
+Agar vocab_size 8000 bolsa va bu 8000 dan oshib ketsa OOV out of vocabulary yani bu soz vocabularyda yoq muammosi chiqsa Index Error beradi. Buni yechimi:
+1. <unk> token 
+2. BPE split(eng kop uchraydigan kichik belgilarni birlashtirib borish va bitta soz bitta token qilish)
+Character level BPE da unk token chiqishi mumkin 
+Byte level BPE da unk token muammosi yoq
+vocab_size = 8000 dataset/meta.jsondagi qiymat bilan bir xil bolishi kerak
+
+block_size
+Model bir martada oqiy oladigan jami tokenlar soni.masalan block_size 256 bolsa Yani user savol berganda userni savolini oqiy oladigan jami 256ta tokenlar soni.
+Agar block_size 256 bolsa va user 257 258 ta tokenli savol bersa model Index Error yoki unable to process xatosini chiqaradi
+
+n_embd
+Tokenning hidden vektori o‘lchami. Vectorning kengligi.
+Bu embedding table olchami. Embedding jadvali ichidagilar model weightlari. n_embd = 256 bolsa har bir Token ID 256 ta sondan iborat vektor orqali ifodalanadi. Ya'ni n_embd — Transformer ichida token haqidagi ma’lumot necha o‘lchamli vektorda qayta ishlanishini belgilaydi.
+
+n_layer
+Modelning chuqurligi. Transformer blocklar(layerlar) soni.Transformer blocklarining chuqurligi. Har bir layerning oz vazifasi bor. Har bir layer sozning turlicha tomonlarini organadi. Layer1 osonidan boshlab layerni oxirgisi murakkab narsalarni organib boradi. Har bir block ichida o‘zining Attention va FFN qismlari bo‘ladi. 
+Token Embedding
+Transformer Block 1
+Normalization → Attention → Residual → Normalization → FFN → Residual
+Transformer Block 2
+Normalization → Attention → Residual → Normalization → FFN → Residual
+Layerlar soni ko‘payishi modelga murakkabroq hisoblashlarni o‘rganish imkonini berishi mumkin, lekin training ko‘proq hisoblash resurslarini talab qiladi.
+
+n_head
+Attention headlari sonini belgilaydi.
+n_embd = 256
+n_head = 4
+n_head=4 bolsa model faqatgina bir tomondan emas birdaniga 4 ta tomondan birdaniga qaraydi( 4 ta bosh) 
+Har bir Attention headlarni olchamini bilish uchun n_embd ni n_headga bolish kerak, va bolganda qoldiqsiz bolinishi kerak. Masalan 256:4=64 har bir attention head 64 olchamli vectordan iborat. Har bir head o‘zining Attention hisoblashini bajaradi. Natijalari birlashtirilib, chiqish proyeksiyasidan o‘tkaziladi.
+
+dropout = 0.1
+Dropout — modelni training vaqtida ortiqcha moslashib qolishdan (Overfitting bolishdan, Memorizationdan) saqlashga yordam beradigan regularizatsiya usuli.Overfittingni kamaytirishga yordam beradigan regularizatsiya.
+dropout = 0.1 degani Dropout qo‘llangan joylarda training vaqtida ayrim aktivatsiya qiymatlari 10% ehtimol bilan vaqtincha nolga aylantirilishini anglatadi.
+[11/5/2026 12:52 AM] .: model.train()  vaqtida Dropout ishlaydi
+model.eval()   vaqtida Dropout o'chiriladi
+Dropoutning eng yaxshi qiymati model hajmi, dataset va training sharoitiga bog‘liq. 0.0, 0.1 kabi qiymatlar uchraydi.
+SLM da kopincha= dropout ishlatiladi 
+ LLMda kopincha = Weight decay ishlatiladi  
+
+ffn_mult = 4 
+FFN ichki o‘lchamini belgilaydi.
+FFNning ichki kengayish koeffitsiyenti.
+ffn_mult birinchi Linear Layer vektor o‘lchamini necha baravar kengaytirishini belgilaydi.
+n_embd = 256
+ffn_mult = 4 bolsa
+256×4= 1024 demak ffn olchami 1024(yashirin qatlam)olchamli vectordan iborat.
+FFNning tuzilishi:
+Input: 256
+Tokenning hidden vektori
+Linear: 256 → 1024
+GELU
+Linear: 1024 → 256
+Output: 256
+Nega avval 1024 ga kengaytirib, keyin yana 256 ga qaytaramiz? Bu FFNga kengroq oraliq reprezentatsiyada nolinear o‘zgarishlar(hisoblashlar) bajarish imkonini beradi. Lekin bunday kengaytirish hisoblash va parametrlar sonini ham oshiradi.
+ffn_mult=4 — FFNning ichki o‘lchami n_embddan 4 baravar katta bo‘ladi (oddiy FFN variantida).
+SwiGLU kabi boshqa FFN arxitekturalarida bu ko‘paytiruvchi va hisoblash formulasi boshqacha bo‘lishi mumkin.
+FFN odatda bilimni saqlash vazifasini ham bajaradi. Modelning bilimlar ombori.
+
+
+tie_weights = True 
+Bu vaznlarni bog‘laydi. Embedding va LM Head vaznlari umumiy bo‘lishi yoki bo‘lmasligini belgilaydi.
+LLMda ikkita asosiy qatlam mavjud:
+Token Embedding — token IDdan vektor oladi.
+LM Head — hidden vektordan barcha tokenlar uchun logits hisoblaydi.
+vocab_size = 8000
+n_embd = 256 bolsa
+Embedding vaznlar jadvali:
+8000 ×256 = 2 048 000
+tie_weights=False bo‘lsa  LM Head uchun ham alohida 2 048 000 ta parametr bo‘lishi mumkin.yani Token Embedding uchun  2 048 000 ta, LM Head uchun  2 048 000 ta jami 4 096 000 ta parametr ishlatiladi.ffn_mult parametrlarni tejaydi va xotirani tejaydi.
+tie_weights=True bo‘lsa, ikkala qatlam(Token Embedding va LM Head)bitta umumiy vaznlar jadvalidan foydalanadi. Shunday qilinsa GPU ham tejaladi.
+ffn_mult ni Input va outputda bir xil lugatdan foydalanadi desak ham boladi. Misol: 
+Uzbek-English(olma ->apple)
+English- Uzbek(apple->olma)
+n_embd = 256, n_head = 4 bo‘lsa, har bir MHA head odatda 64 o‘lchamli bo‘ladi.
+n_embd = 256, ffn_mult = 4 bo‘lsa, oddiy FFNning ichki kengligi 1024 bo‘ladi.
+n_embd, n_layer, n_head va ffn_mult asosan modelning o‘lchami va tuzilishini belgilaydi.tie_weights esa vaznlarni ulashish tartibini belgilaydi.
+
+
+LLMda Model Design nima?
+Model Design (Modelni loyihalash) — bu LLMni yaratishdan va Pre-trainingni boshlashdan oldin model qanday tuzilishga ega bo‘lishi, qanday ishlashi, qaysi texnologiyalardan foydalanishi va qanday cheklovlarga ega bo‘lishini rejalashtirish jarayonidir.
+Yanada aniqrogi:
+Model Design — LLMning arxitekturasini tanlash, uning qismlarini loyihalash va barcha qismlar qanday bog‘lanishini belgilashdir.
+Model Architecture esa Neyron tarmoqning tuzilishidir
+Model Configuration esa tanlangan tuzilmaning,arxitekturaning aniq sozlamalaridir.
+
+configs/run_01.yaml
+Modelning aniq qiymatlarini saqlaydi.
+Modelning arxitektura va training sozlamalarini saqlaydi. Masalan, n_layer=4 , n_embd=256 , n_head=4 kabi
+2. src/model_config.py
+Qiymatlarni tekshiradi, parametrlar va taxminiy xotirani hisoblaydi.
+ModelConfig dataclass yordamida sozlamalarni Python obyektiga birlashtiradi, tekshiradi hamda parametr va xotira hisoblarini amalga oshiradi.
+shu qismlarning parametrlarini hisoblab, modelning umumiy o‘lchamini taxmin qilish mumkin.
+3. scripts/design_model.py
+Model arxitekturasini ekranga chiqaradi va har bir parametrga qancha training token to‘g‘ri kelishini tekshiradi.
+Model Design jarayonini ishga tushiradi, konfiguratsiyani o‘qiydi, model hajmi, xotira va tokens-per-parameter hisobotini chiqaradi.
+design_model.pyni ishga tushirsak, model necha qatlamli bo‘lishini, taxminan nechta parametrga ega bo‘lishini va qancha xotira talab qilishini bilamiz.
+[11/5/2026 12:52 AM] .: Tokens-per-parameter — trainingda qayta ishlanishi rejalashtirilgan tokenlar sonining modeldagi o‘rganiladigan parametrlar soniga nisbati. Yani har bir parametrga qancha training token to‘g‘ri kelishi.
+Eng sodda qilib aytsak:
+YAML — qiymatlarni saqlaydi.
+model_config.py — shu saqlangan qiymatlar bilan hisoblash va tekshirishni bajaradi.
+design_model.py — butun jarayonni ishga tushiradi.
+Natijada: Pre-training boshlanishidan oldin modelning taxminiy hajmi va zarur hisoblash resurslari ma’lum bo‘ladi.
+
+configs/run_01.yaml bilan src/model_config.py farqini korib chiqamiz:
+configs/run_01.yaml:
+Sozlamalar va qiymatlar saqlanadi
+Modelning tanlangan qiymatlari saqlanadi
+Yangi tajribada qiymatlar ozgaradi
+src/model_config.py:
+Python kodi, formulalar, mantiq va tekshiruvlar boladi
+Yaml fayl qiymatlarini oqib qabul qilib tekshiradi, hisoblaydi
+Asosiy qoidalar kopincha saqlanadi
+model_config.py da Agar yangi parametr, arxitektura yoki tekshiruv qo‘shilsa, Python kodi ham o‘zgarishi mumkin.
+
+scripts/design_model.py dasturini ishga tushirgandan keyin chiqadigan 4 ta asosiy natija (Output Metric):
+1.head_dim — bitta Attention headning o‘lchami.
+2.TOTAL Params — modeldagi jami o‘rganiladigan parametrlar soni.
+3.Rough training memory — training uchun taxminiy GPU xotira talabi.
+4.Tokens per parameter — training tokenlari sonining parametrlar soniga nisbati.
+Shundan so‘ng Model Design natijalarini tekshirib, modelni yaratish va Pre-trainingni boshlash uchun tanlangan konfiguratsiya resurslarga mos kelish-kelmasligini baholaymiz.
+model/transformer.py - Haqiqiy Transformer modelini quradi
+training/train.py - Modelning vaznlarini o‘qitadi
