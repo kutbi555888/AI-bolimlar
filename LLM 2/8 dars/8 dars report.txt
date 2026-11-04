@@ -1,0 +1,189 @@
+8 dars
+
+Attention - Gapdagi sozlar bir biri bilan gaplashish imkonini beradigan mexanizm va bu model umumiy contextni tushunishiga yordam beradi.
+modelga mavjud ma’lumotlar orasidan qaysilariga qancha e’tibor qaratishni hisoblash imkonini beradigan mexanizm.
+kerakli ma’lumotga qanchalik e’tibor berishni hisoblashning umumiy mexanizmi.
+Attention shunday savollarga sonli hisoblash orqali javob beradi:
+Qaysi tokenlardan ma’lumot olish mumkin?
+Har bir tokenga qanday og‘irlik beriladi?
+Olingan ma’lumotlar qanday birlashtiriladi?
+
+Self-Attention — bitta ketma-ketlikdagi tokenlarning o‘zaro ma’lumot almashishi. Q, K va V bitta ketma-ketlikning o‘zidan hosil qilinadigan Attention turi.Self-Attentionda  har bir token boshqa tokenlarni ko‘ra oladi, butun gapdagi tokenlardan ma’lumot olishi mumkin.bidirectional (ikki tomonlama) degani Self-Attention orqani ham oldinni ham kora oladi
+Self-Attention degani tokenlar doim kelajakni ko‘radi degani emas. Bu Q, K, V bir ketma-ketlikdan kelishini bildiradi. Kelajakni ko‘rish-ko‘rmaslik esa maskga bog‘liq.
+
+Causal Self-Attention — token o‘zini va undan oldingi tokenlarni ko‘radi, lekin o‘zidan keyingi tokenlarni ko‘ra olmaydi.
+Self-Attentionning kelajakdagi tokenlarni ko‘rishga ruxsat bermaydigan ko‘rinishi.Causal Attentionda model kelajakdagi tokenlardan foydalanmaydi.Causal Self-Attention alohida, butunlay boshqa algoritm emas. U Self-Attention + Causal Mask orqali hosil qilinadi.
+Causal Mask qanday ishlaydi?
+Self-Attention hisoblanayotganda Q va Kdan Attention Scores matritsasi chiqadi.
+Causal Mask kelajakdagi pozitsiyalarning score qiymatlariga −∞ qo‘shadi (yoki ularga teng kuchli masklash usulini qo‘llaydi).
+Keyin Softmax ishlaydi.
+Masalan, Men pozitsiyasi uchun:
+Attention scores:
+Men             → 2.0
+kitob           → 3.0
+o‘qiyapman      → 5.0
+Causal Maskdan keyin:
+Men             → 2.0
+kitob           → -∞
+o‘qiyapman      → -∞
+Softmax natijasi:
+Men             → 1.0
+kitob           → 0.0
+o‘qiyapman      → 0.0
+muhim holat:
+Causal Attention ishlatilsa ham, model javob yaratayotganda promptda oldindan mavjud bo‘lgan barcha tokenlardan foydalanishi mumkin.
+Masalan, promptda 500 ta token bo‘lsa, 501-pozitsiyadagi birinchi javob tokenini bashorat qilish uchun oldingi 500 ta tokenning barchasi mavjud.
+
+
+Cross-Attention — Transformer ichidagi mexanizm bo‘lib, u bir ketma-ketlikdagi tokenlarga boshqa ketma-ketlikdan ma’lumot olish imkonini beradi.
+Cross Attention Decoderga Encoder qayta ishlagan malumotlarni yetkazib berishda, Decoder bilan Encoder orasida boglovchi bolishda orni juda katta. Query Decoder dan , Key va Value Encoderdan keladi.Self-Attention bilan Cross-Attentionning eng katta farqi — Q (Query), K (Key), V (Value) qayerdan olinishi va qaysi ma’lumotlar o‘zaro bog‘lanishidir.
+Ikkalasi ham Attention mexanizmidan foydalanadi. Lekin Self-Attention bitta ketma-ketlik ichida, Cross-Attention esa ikkita alohida ma’lumot oqimi o‘rtasida ishlaydi.
+Self-Attention — tokenlar o‘z ketma-ketligidagi tokenlardan ma’lumot oladi.
+Cross-Attention — tokenlar boshqa ketma-ketlikdagi ma’lumotlardan foydalanadi.
+Self-Attention — o‘z ichidagi ma’lumotlardan foydalanish.
+Cross-Attention — boshqa manbadagi ma’lumotlardan foydalanish.
+Causal Self-Attention — kelajakdagi tokenlarni ko‘rmasdan o‘z ketma-ketligidagi ma’lumotlardan foydalanish.
+
+
+Global Attention nima?
+Global Attention deganda odatda Attentionning butun mavjud ketma-ketlik bo‘ylab ishlashi tushuniladi.
+Agar u Bidirectional Self-Attention bo‘lsa, har bir token o‘zidan oldingi va keyingi tokenlarga ham qaray oladi.Masalan, BERT kabi encoder modellarida bidirectional self-attention qo‘llanadi.Global Attention agar mask ruxsat bersa, har bir pozitsiya butun kirish ketma-ketligidan foydalanishi mumkin.Causal Attention trainingda kelajak target tokenlaridan foydalanishni bloklaydi.
+Frontier modellar Global Attention dan ham Causal Self-Attention dan ham foydalanadi.
+[11/5/2026 12:54 AM] .: Attention turlari qayerlarda ishlatiladi?
+1.Full / Bidirectional Self-Attention: Matnni tushunish, klassifikatsiya, sentiment analysis, NER, matndan ma’lumot ajratish
+modellar:BERT, RoBERTa
+2.Causal Self-Attention:
+Matn yaratish, chatbot, kod yozish, savollarga javob berish, keyingi tokenni bashorat qilish
+modellar:GPT, Llama
+3.Global Attention:
+Uzoq matn yoki hujjatdagi uzoq joylashgan tokenlar o‘rtasida ma’lumot almashishda
+modellar:Longformer, BigBird; standart Transformerda ham global qamrov bo‘lishi mumkin
+4.Cross-Attention:
+Tarjima, audiodan matn yaratish, rasmni tavsiflash, matn asosida rasm yaratish modellar:T5, BART, Whisper, ayrim multimodal va diffusion modellar
+Qisqacha: BERT — tushunish, GPT — yaratish, Longformer — uzun kontekst, T5/Whisper — Encoder va Decoder orasida ma’lumot almashish.
+
+Attention — tokenlar o‘rtasida ma’lumot almashishni amalga oshiradi.
+FFN (MLP) — har bir tokenning vektorini modelning o‘rganilgan vaznlari orqali qayta ishlaydi.
+FFN haqiqatan bilimlarni saqlaydimi?
+Haqiqiy FFNda tayyor matnli faktlar saqlanadigan alohida kataklar yo‘q.U yerda training davomida o‘rganilgan sonli vaznlar (Weights) mavjud. Bilimlarni saqlaydi degani weightlar(vaznlarni) saqlaydi degani.FFN — bilimlar bilan ishlashda muhim komponent, lekin barcha bilimlar faqat FFNda saqlanmaydi. Embedding, Attention va boshqa o‘rganilgan parametrlar ham modelning imkoniyatlariga hissa qo‘shadi.
+
+Oddiy FFN Linear → GELU → Linear dan iborat.Birinchi Linear nega 384 ni 1536 ga aylantiradi?Chunki modelga tokenning 384 o‘lchamli hidden vektori asosida ko‘proq oraliq xususiyatlarni hisoblash imkoniyati beriladi.
+Birinchi Linear 384 ta kirish qiymatidan 1536 ta chiqish qiymatini o‘rganilgan vaznlar yordamida hisoblaydi.
+GELU nega kerak?
+GELU oraliq qiymatlarni nolinear o‘zgartiradi. Shu orqali model oddiy Linear bilan ifodalab bo‘lmaydigan murakkab munosabatlarni ham o‘rganishi mumkin.
+Ikkinchi Linear nega 1536 ni 384 ga qaytaradi?
+Chunki Transformer blockining kirish va chiqish hidden o‘lchamlari mos bo‘lishi kerak.
+Ikkinchi Linear 1536 ta oraliq qiymatdan 384 ta yangi qiymat hisoblaydi. Keyin bu chiqish Residual Connection orqali avvalgi hidden state bilan qo‘shilishi mumkin.
+
+Attention — Dynamic, FFN — Static nima degani?
+Dynamic — o‘zgaruvchan degani. Inference vaqtida Attention vaznlari ozgarmaydi.lekin Attentionning og‘irliklari (Attention Weights) kiruvchi matn va kontekstga qarab o‘zgaradi.
+FFN — Static
+Static — bu yerda o‘rganilgan FFN vaznlari inference vaqtida o‘zgarmasligini anglatadi.
+muhim tomoni: Training vaqtida FFN vaznlari ham, Attentionning o‘rganiladigan vaznlari ham yangilanadi. Lekin Inference vaqtida W_Q, W_K, W_V vaznlarining o‘zi oddiy inference vaqtida o‘zgarmaydi. Lekin ulardan hisoblanadigan Q, K, V va Attention og‘irliklari kirish matniga qarab o‘zgaradi. Soddaroq aytsak Inference paytida ikkalasining ham o‘rganilgan vaznlari o‘zgarmaydi, lekin hisoblash natijalari kirish ma’lumotiga qarab o‘zgaradi.
+Eng asosiy tushuncha:
+Attention — tokenlar orasidagi ma’lumotlarni bog‘laydi. FFN — har bir tokenning kontekstli vektorini nolinear ravishda qayta ishlaydi.
+
+
+Transformer
+Transformerni asosiy bir katta bino deb tasavvur qilishimiz mumkin.
+1.Transformer bir nechta ketma-ket Blocklardan,layerlardan tashkil topadi.
+Har bir Blockning tuzilishi bir xil, ammo ularning o‘rganiladigan vaznlari odatda alohida bo‘ladi.
+n_layer 6 - 6 ta Transformer Block
+n_head 6 -  Har bir Blockda 6 ta Attention head
+n_embd 384 -  Hidden vektorning o‘lchami
+ffn_mult 4 - FFN ichki o‘lchamini 4 baravar kengaytirish
+2.Transformer ichidagi bitta block nimalardan tashkil topgan.bir Block ichida Normalization orqali Vektor qiymatlarini me’yorlashtiradi,Attention orqali tokenlar o‘rtasida axborot almashiladi,Residual Connection esa oldingi hidden state bilan yangi natijalarni birlashtiradi. FFN orqali har bir tokenning hidden vektori qayta ishlanadi.
+[11/5/2026 12:54 AM] .: Attention:
+Q, K, V vektorlarni hisoblaydi.
+Query va Key orasidagi moslikni hisoblaydi.
+Softmax yordamida Attention og‘irliklarini oladi.
+Value vektorlarini shu og‘irliklarga ko‘ra birlashtiradi.
+Residual Connection:
+Attentiondan oldingi hidden state'ni Attention natijasi bilan qo‘shadi.malumotlar yoqolmasligini taminlaydi.
+FFN — Attentiondan keyin har bir tokenning hidden vektorini alohida qayta ishlaydi.
+Final Normalization:
+Oxirgi Blockdan kelgan hidden state'larni normallashtiradi.
+LM Head:
+Oxirgi hidden stateni Vocabularydagi barcha tokenlar uchun baholarga aylantiradi.
+vocab_size = 8000
+n_embd = 384
+Har bir pozitsiyada keyingi token uchun 8000 ta baho hisoblanadi.
+
+
+LLMni Pre-training qilishdan oldin bajariladigan ikkita muhim test bor bular:
+1.Initial Loss Check (Uniform Bias Check) — model hali o‘qitilmagan paytda Loss qiymati mantiqan to‘g‘rimi?hali o‘qitilmagan modelning dastlabki Loss qiymatini tekshirish.
+2.Causality Verification (Anti-Cheat Check) — Causal Self-Attention kelajakdagi tokenlardan ma’lumot olib qo‘ymayaptimi?
+Bu testlarning asosiy maqsadi — modelni bir necha soat yoki kun o‘qitib, keyin uning arxitekturasida xato borligini bilib qolishning oldini olishdir.
+Model Initialization — training boshlanishidan oldin vaznlarga maxsus matematik usullar yordamida boshlang‘ich qiymatlar berish jarayoni.
+Sanity Check nima?
+Sanity Check — dastur yoki modelning eng asosiy qismlari kutilganidek ishlayotganini tekshiradigan dastlabki, odatda kichik va tez test.
+Masalan, biz LLM modelini yaratdik.Modelni PyTorchda yaratdik, ammo hali Pre-training boshlanmadi.
+Shu vaqtda quyidagi savollar tug‘iladi:
+Embedding va LM Head to‘g‘ri ishlayaptimi?
+Model Vocabularydagi tokenlar uchun to‘g‘ri baholar chiqaryaptimi?
+Loss hisoblashimiz to‘g‘rimi?
+Causal Mask ishlayaptimi?
+Model kelajakdagi tokenlarni ko‘rib qo‘ymayaptimi?
+Mana shu savollarni tekshirish uchun Sanity Check bajariladi.
+Initial Loss Check — Pre-training boshlanishidan oldin modelning dastlabki token bashoratlari va Cross-Entropy Loss qiymati kutiladigan boshlang‘ich holatga mosligini tekshiradi.Initial Loss Check — model hali o‘qitilmasdan oldin Loss hisoblash to‘g‘ri ishlayotganini dastlabki tekshirish. Agar vocab_size=8000 va bashoratlar uniform bo‘lsa, nazariy Cross-Entropy Loss ln(8000) ≈ 8.99 bo‘ladi. Haqiqiy boshlang‘ich Loss bundan farq qilishi mumkin.
+Bu test modelning dastlabki bashorat va Loss hisoblashini tekshiradi.
+Loss — model bashorati bilan to‘g‘ri javob o‘rtasidagi farqni matematik baholovchi xatolik funksiyasi.
+GPT turidagi LLMda odatda Cross-Entropy Loss ishlatiladi.
+Uniform Distribution degani teng ehtimollikli taqsimot degani.
+Random Initialization — model vaznlariga maxsus boshlang‘ich usul orqali qiymatlar berish.
+Batch — bir vaqtda qayta ishlanadigan training misollari guruhi.
+Logits — LM Head chiqargan, keyingi tokenlar uchun hali ehtimollikka aylantirilmagan sonli baholar.
+NaN — Not a Number, ya’ni sonli hisoblashda yaroqsiz qiymat.
+inf — Infinity, ya’ni cheksizlik.
+Loss juda kichik chiqsa, model hali o‘qitilmagan bo‘lsa ham to‘g‘ri tokenni oldindan ko‘rib qo‘ymayaptimi, degan savolni tekshirish zarur.
+
+Ikkinchi test: Causality Verification (Anti-Cheat Check)
+Bu degani — model kelajakdagi tokenlardan foydalanmayotganini tekshirish degani.
+Causal Self-Attention kelajakdagi tokenlarni ko‘rmayotganini tekshirish. Buning uchun kelajakdagi token o‘zgartiriladi va oldingi pozitsiyalarning logitslari o‘zgarmasligi tekshiriladi.
+Bu test esa modelning kelajakdagi ma’lumotlardan foydalanmaslik qoidasiga rioya qilishini tekshiradi.
+Anti-Cheat Check qanday bajariladi?
+eng muhim joyi shu yer.yani Kelajakdagi tokenni o‘zgartirib, oldingi tokenlarning natijasi o‘zgarmaganini tekshiramiz.
+Birinchi holat:
+Input 1:
+[A, B, C, D]
+Ikkinchi holat:
+Input 2:
+[A, B, C, X]
+Faqat oxirgi tokenni almashtirdik:
+D → X
+A, B, C esa o‘zgarmadi.
+Endi modelni 1chi va ikkinchi holatda test qilib korganimizda ABC tokenlar logitslari ozgarmasligi kerak faqat D token ozgarishi mumkin.Nega oldingi tokenlarning natijasi o‘zgarmasligi kerak.Chunki Causal Self-Attentionda A, B va C pozitsiyalariga D tokenidan ma’lumot kelishi mumkin emas. A,B,C pozitsiyasining logitslari o‘zgarmasligi kerak. Lekin Oxirgi D pozitsiyaning logitslari esa o‘zgarishi mumkin.Bu yerda logitslarni solishtirish kerak. Agar butun ketma-ketlikning Loss qiymatini solishtirsangiz, oxirgi target token o‘zgargani uchun Loss ham o‘zgarishi mumkin. Bu o‘z-o‘zidan Causal Mask xato degani emas.
+bu tasodifiy sun’iy tokenlar bilan bajariladigan smoke test. Keyinchalik haqiqiy validation batch bilan ham Lossni tekshirish maqsadga muvofiq.
+Causal Mask to‘g‘ri variant:
+A → A
+B → A, B
+C → A, B, C
+D → A, B, C, D
+Causal Mask noto‘g‘ri variant:
+A → A, B, C, D
+B → A, B, C, D
+C → A, B, C, D
+D → A, B, C, D
+Agar Causal Mask va modelning boshqa ma’lumot oqimlari to‘g‘ri qurilgan bo‘lsa, kutiladigan natija:
+Causality Test PASS: True
+Maximum difference: 0.0
+Maximum difference har doim aynan nol bo‘lishi shart emas; ayrim hisoblashlarda juda kichik sonli tafovutlar bo‘lishi mumkin.
+1. Initial Weights — trainingdan oldin yaratilgan o‘rganiladigan parametrlarning boshlang‘ich qiymatlari.
+2. Initial Predictions — shu vaznlar bilan model chiqargan birinchi logits va ehtimolliklar.
+3. Initial Loss Check — shu dastlabki bashoratlar asosida hisoblangan Lossning mantiqan to‘g‘ri ekanini tekshirish.
+
+
+Fayllar
+1. src/attention.py — CausalSelfAttention klassi joylashadi. Q, K, V vektorlarini yaratadi, Attention Scores va Softmaxni hisoblaydi. Causal Mask yordamida kelajakdagi tokenlarni yashiradi va Attention Output hosil qiladi.
+
+2. src/mlp.py — FeedForward (FFN) klassi joylashadi. Har bir tokenning hidden vektorini Linear → GELU → Linear orqali qayta ishlaydi. Birinchi Linear o‘lchamni kengaytiradi, GELU nolinearlik kiritadi, ikkinchi Linear esa dastlabki o‘lchamga qaytaradi.
+
+3. src/transformer_block.py — TransformerBlock klassi joylashadi. Normalization, CausalSelfAttention, Residual Connection va FeedForward qismlarini birlashtiradi. Bitta to‘liq Transformer Blockning ishlashini tashkil qiladi.
+
+4. src/model.py — LLM klassi joylashadi. Token Embedding, Positional Information, Transformer Blocklar, Final Normalization va LM Headni birlashtiradi. Token IDlarni qabul qilib, keyingi tokenlar uchun Logits hisoblaydi.
+
+5. scripts/build_model.py — Model Configuration asosida LLM modelini yaratadi. Model arxitekturasini, qatlamlarini va jami parametrlar sonini (Total Parameters) ekranga chiqaradi. Modelning to‘g‘ri qurilganini dastlabki tekshirishga yordam beradi.
+
+6. tests/test_model.py — Modelning to‘g‘ri ishlashini tekshiradigan 4 ta test joylashadi. Masalan, Tensor Shape, Forward Pass, Initial Loss va Causality Verification testlari. Xatolarni Pre-training boshlanishidan oldin aniqlashga yordam beradi. Aniq 4 ta test loyiha talablariga qarab belgilanadi.
+
+7. requirements.txt — LLM loyihasi uchun zarur Python kutubxonalarini saqlaydi. Unga torch (PyTorch) qo‘shiladi. PyTorch Tensorlar, Embedding, Attention, FFN, Gradient va boshqa neyron tarmoq hisoblashlarini bajarish uchun ishlatiladi..
