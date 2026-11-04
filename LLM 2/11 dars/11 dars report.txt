@@ -1,0 +1,287 @@
+11 dars
+
+Serving & Readiness — LLM o‘qitib bo‘lingandan keyin uni foydalanuvchilar ishlata oladigan holatga keltirish va so‘rovlarni qabul qilishga tayyorligini tekshirish jarayonidir.
+Bu ikkita alohida, lekin bir-biriga bog‘liq tushunchadir:
+Serving — o‘qitilgan LLMni serverda ishga tushirish va foydalanuvchilarning savollariga javob qaytarishini ta’minlash.Servingning asosiy vazifasi  tayyor modelni haqiqiy dastur sifatida ishlatish imkonini yaratishdir.
+Serving jarayoni:
+API foydalanuvchining savolini qabul qiladi.
+Tokenizer matnni token IDlariga aylantiradi.
+Model tokenlardan foydalanib keyingi tokenlarni bashorat qiladi.
+Inference engine javob tokenlarini hosil qiladi.
+Tokenizer javob tokenlarini matnga aylantiradi.
+Server tayyor javobni foydalanuvchiga yuboradi.
+Serving faqat modelni ishga tushirish emas, balki foydalanuvchi va model o‘rtasidagi butun aloqa jarayonini boshqarishdir.
+
+Readiness esa — LLM haqiqatan ham so‘rovlarni qabul qilish va ularga xizmat ko‘rsatishga tayyormi yoki yo‘qmi, shuni tekshirish.server yoki model hozir foydalanuvchi so‘rovlarini qabul qilishga tayyorligini aniqlaydi.
+Readiness nimalarni tekshiradi?
+Odatda quyidagi shartlar muhim:
+Model Loaded — model vaznlari muvaffaqiyatli yuklanganmi?
+Tokenizer Ready — tokenizer ishlashga tayyormi?
+GPU/CPU Ready — model ishlashi uchun kerakli resurslar mavjudmi?
+Inference Engine Ready — inference mexanizmi ishga tushganmi?
+Warmup Completed — agar talab qilinsa, dastlabki sinov hisoblashlari tugaganmi?Serving Warmup — model ishga tushgandan keyin dastlabki hisoblashlarni bajarib, inference tizimini tayyorlash jarayoni.
+Critical Dependencies Ready — xizmat uchun majburiy boshqa komponentlar ishlayaptimi?
+Request Acceptance — server yangi so‘rovlarni xavfsiz qabul qila oladimi?
+
+Serving & Readiness qanday ishlaydi?
+1. Trained LLM
+O‘qitilgan model va uning vaznlari
+2. Model Serving
+Model serverga yuklanadi va API orqali ishlaydi
+3. Readiness Check
+Model va xizmat so‘rovlarni qabul qilishga tayyorligi tekshiriladi
+4. Ready — xizmat tayyor
+Foydalanuvchi so‘rovlari qabul qilinadi
+5. Inference
+LLM javobni generatsiya qiladi
+
+Train → Package → Serve → Users
+Bu quyidagilarni anglatadi:
+Train — LLMni o‘qitish.
+Package — modelni ishga tushirish uchun kodlar, kutubxonalar va sozlamalarni tayyorlash.
+Serve — modelni API orqali foydalanuvchilarga taqdim qilish.
+Users — foydalanuvchilar modelga savol yuborib, javob olishlari.
+
+
+Aniqroq
+Serving — o‘qitilgan LLMni serverda ishga tushiradi, so‘rovlarni qabul qiladi va model javoblarini foydalanuvchilarga yetkazadi.
+Readiness — model, tokenizer, inference engine va boshqa zarur komponentlar ishlashga tayyorligini tekshiradi.
+
+2.Deployment Options — Modelni qayerda ishga tushirish mumkin?
+
+Deployment — tayyor dasturni ishlaydigan server yoki muhitga joylashtirish jarayoni.
+ta variant ko‘rsatilgan.
+1. Cloud — bulutli server
+Modelni AWS, Google Cloud yoki boshqa bulutli platformalardagi serverda ishga tushirish.
+2. Local / On-premise — mahalliy server
+Modelni o‘z kompyuterimizda yoki tashkilotning serverida ishlatish.
+3.3. Docker — konteynerlash
+Model xizmatini kerakli kutubxonalar va dastur muhiti bilan birga konteynerga joylashtiradi.
+Afzalligi: dasturni boshqa kompyuter yoki serverga ko‘chirish va ishga tushirish osonlashadi.
+Cloud va Local modelning qayerda ishlashini bildiradi. Docker esa uni qanday qilib qadoqlash va ishga tushirish usuli. Docker bilan tayyorlangan xizmat Cloud yoki Local muhitda ishlashi mumkin.
+
+Project Structure — Loyiha fayllari
+quyidagi fayllar bolishi kerak:
+my-llm-service/
+│
+├── app/
+│   ├── main.py
+│   ├── model.py
+│   └── schemas.py
+│
+├── Dockerfile
+├── requirements.txt
+└── .env
+
+1. app/main.py — API serverni yaratish
+FastAPI ilovasini yaratadi va API manzillarini (/generate, /health) belgilaydi. Foydalanuvchi so‘rovlarini qabul qiladi hamda model javobini qaytaradi.
+2. app/model.py — LLM modelini ishga tushirish
+O‘qitilgan model vaznlarini va tokenizerni yuklaydi. Modelga so‘rov yuborish, inference bajarish va javob generatsiyasini boshqarish funksiyalari shu yerda bo‘ladi.
+3. app/schemas.py — ma’lumotlarning tuzilishini belgilash
+APIga keladigan so‘rov va qaytariladigan javob qanday formatda bo‘lishini aniqlaydi. Pydantic BaseModel yordamida prompt, max_new_tokens kabi maydonlarni tekshiradi.
+4. Dockerfile — Docker muhitini tayyorlash
+Dastur ishlashi uchun kerakli Python versiyasi, kutubxonalar, fayllar va ishga tushirish buyrug‘ini belgilaydi. Shu fayl yordamida Docker image yaratiladi.
+5. requirements.txt — Python kutubxonalari ro‘yxati
+Loyiha uchun zarur fastapi, uvicorn, torch, transformers kabi kutubxonalarni va kerak bo‘lsa ularning versiyalarini belgilaydi.
+6. .env — muhit sozlamalari
+API kalitlari, server sozlamalari va boshqa konfiguratsiya qiymatlarini saqlashi mumkin. Maxfiy ma’lumotlar .gitignore orqali Gitga qo‘shilmasligi va serverda xavfsiz boshqarilishi kerak.
+
+4.FastAPI Endpoint — foydalanuvchi so‘rovlarini qabul qiladi, LLMga uzatadi va generatsiya qilingan javobni qaytaradi.
+
+5.How to Deploy — Modelni serverga qanday joylashtiramiz?
+1.Build Docker Image: Dockerfile asosida ishga tushirishga tayyor dastur muhiti yaratiladi.
+2.Push to Registry: Docker image maxsus saqlash xizmatiga yuboriladi. Masalan, Docker Hub yoki GitHub Container Registry.
+3.Deploy: Image serverga joylashtirilib, konteyner ishga tushiriladi.
+4.Get Public API Endpoint: Tashqi foydalanuvchilar ulana oladigan API manzili taqdim etiladi.
+
+6.Readiness Checklist — Ishga tushirishdan oldingi tekshiruv
+modelni foydalanuvchilarga taqdim etishdan oldin, tizimning zarur qismlari tayyor ekanini tekshirish ro‘yxati.
+model, API, Docker, muhit sozlamalari, health check, logging va monitoring tayyorligini tekshiradi.
+
+7.Why It Matters — Bular nima uchun kerak?
+Real Users :
+Modeldan haqiqiy foydalanuvchilar veb-sayt, mobil ilova yoki API orqali foydalanadi
+Reliability:
+ Server barqarorligi, xatolarni aniqlash va xizmatning uzluksiz ishlashini yaxshilaydi
+Scalability:
+ Foydalanuvchilar soni ortganda server resurslarini ko‘paytirish imkonini beradi
+Security:
+ API kalitlari, foydalanuvchi ma’lumotlari va xizmatni himoyalashga yordam beradi
+Reliability — ishonchlilik, ya’ni xizmatning barqaror ishlashi.
+Scalability — masshtablanuvchanlik, ya’ni ko‘proq so‘rovga xizmat qilish uchun resurslarni kengaytira olish.
+Security — xavfsizlik, ya’ni tizim va ma’lumotlarni ruxsatsiz foydalanishdan himoya qilish.
+
+Servise/Sampling/Readiness ga tegishli fayllar
+1. inference/sampling.py — LLM keyingi tokenni qanday tanlashini boshqaradi. Temperature, Top-K, Top-P va Repetition Penalty orqali javobning tasodifiyligi, xilma-xilligi va takrorlanishini nazorat qiladi.
+
+2. inference/engine.py — O‘qitilgan model va tokenizerni xotiraga yuklaydi. Foydalanuvchi matnini tokenlarga aylantirib, model orqali javob generatsiya qilish jarayonini boshqaradi.
+
+3. deployment/app.py — FastAPI yordamida LLM uchun API server yaratadi. /generate orqali so‘rovlarni qabul qilib, javob qaytaradi; /health orqali server holatini tekshiradi.
+
+4. deployment/Dockerfile — LLM xizmatini Docker konteynerida ishga tushirish uchun muhit tayyorlaydi. Python, kutubxonalar, loyiha fayllari va serverni ishga tushirish buyrug‘ini belgilaydi.
+
+5. deployment/requirements.txt — LLM xizmatiga kerakli Python kutubxonalarini va ularning versiyalarini ro‘yxatlaydi. FastAPI, Uvicorn, PyTorch kabi kutubxonalarni o‘rnatish uchun ishlatiladi.
+
+
+
+
+LLMda Evaluation va Generation
+
+Evaluation nima?
+Evaluation — LLMning bilimini, bashorat qilish qobiliyatini, javob sifatini va umumiy ishlash samaradorligini baholash jarayoni.
+Evaluation vaqtida model odatda yangi bilim o‘rganmaydi, ya’ni uning vaznlari yangilanmaydi.
+Evaluation nima uchun kerak?
+Modelning qanchalik yaxshi o‘qitilganini aniqlash.
+Model yangi, ilgari ko‘rmagan ma’lumotlarda qanday ishlashini tekshirish.
+Model xatolarini va kamchiliklarini topish.
+Turli modellar yoki checkpointlarni solishtirish.
+Overfittingni aniqlash — model training ma’lumotlarini yaxshi o‘rganib, yangi ma’lumotlarda yomon ishlashi.
+Modelni foydalanuvchilarga taqdim etishga tayyorligini baholash.
+
+Evaluation qanday ishlaydi?
+1. Evaluation Dataset
+Modelni tekshirish uchun ajratilgan ma’lumotlar
+2. Trained LLM
+Model test savollariga javob beradi yoki tokenlarni bashorat qiladi
+3. Metrics Calculation
+Xato va sifat ko‘rsatkichlari hisoblanadi
+4. Evaluation Results
+Modelning natijalari va kamchiliklari aniqlanadi
+
+Asosiy Evaluation metrikalari
+1. Evaluation Loss
+Modelning bashorat qilish xatosini ko‘rsatadi.
+Odatda pastroq loss yaxshiroq hisoblanadi.
+2. Perplexity (PPL)
+Til modeli keyingi tokenlarni qanchalik yaxshi bashorat qilishini o‘lchaydi.
+3. Accuracy
+To‘g‘ri bajarilgan javoblar ulushini ko‘rsatadi. Ayniqsa aniq javobli testlarda ishlatiladi.
+4. F1 Score
+Precision (model to‘g‘ri deb belgilagan natijalarning qanchasi haqiqatan to‘g‘ri) va Recall (mavjud to‘g‘ri natijalarning qanchasini model topgani) o‘rtasidagi muvozanatni baholaydi.
+5. BLEU va ROUGE
+Yaratilgan matnni namunaviy javoblar bilan solishtirish uchun ishlatiladigan metrikalar. BLEU ko‘proq tarjimada, ROUGE esa xulosa yaratish kabi vazifalarda ishlatiladi.
+
+
+
+
+Generation nima?
+Generation (Text Generation) — o‘qitilgan LLMning berilgan matn asosida yangi tokenlarni ketma-ket yaratish jarayoni.Generationda model odatda bitta tokenni bashorat qiladi, uni mavjud matnga qo‘shadi va keyingi tokenni hisoblaydi.
+Generation qanday ishlaydi?
+1. Prompt
+Foydalanuvchi matni: "Bugun havo..."
+2. Tokenization
+Matn token IDlariga aylantiriladi
+3. Forward Pass
+Model keyingi token uchun logits hisoblaydi
+Logits — model tokenlarga ehtimollik berishdan oldin hisoblaydigan sonli qiymatlar. Ular odatda Softmax funksiyasi orqali ehtimolliklarga aylantiriladi.
+4. Sampling
+Keyingi token tanlanadi, masalan "yaxshi"
+5. Repeat
+Keyingi tokenlar ketma-ket yaratiladi
+6. Output
+Tayyor matn foydalanuvchiga qaytariladi
+
+Generation qanday usullardan tashkil topgan?
+Generation jarayonida keyingi tokenni tanlashning turli algoritmlari mavjud.
+Greedy Decoding -  Har safar ehtimolligi eng yuqori tokenni tanlaydi
+Beam Search -  Bir nechta mumkin bo‘lgan davomlarni parallel solishtiradi
+Temperature Sampling -  Tokenlar ehtimolligi taqsimotining keskinligini o‘zgartiradi
+Top-K Sampling  - Eng yuqori ehtimollikka ega K ta token ichidan tanlaydi
+Top-P Sampling -  Jami ehtimolligi belgilangan chegaraga yetadigan tokenlar guruhidan tanlaydi
+Repetition Penalty -  Takroriy tokenlar tanlanishini kamaytirishga yordam beradi
+
+Generationning boshqa muhim parametrlari ham mavjud:
+max_new_tokens — maksimal nechta yangi token yaratilishini belgilaydi.
+eos_token_id — matn tugaganligini bildiradigan maxsus token IDsi.
+stop_sequence — oldindan belgilangan matn ketma-ketligi paydo bo‘lganda generatsiyani to‘xtatish sharti.
+do_sample — tokenlar ehtimollik asosida tasodifiy tanlanishini yoqadi yoki o‘chiradi.
+
+Evaluation va Generation LLM loyihasining qaysi qismida joylashadi?
+Misol uchun:
+my_LLM/
+│
+├── src/
+│   ├── model.py
+│   └── trainer.py
+│
+├── evaluation/
+│   ├── evaluate.py
+│   └── metrics.py
+│
+├── inference/
+│   ├── generate.py
+│   ├── sampling.py
+│   └── engine.py
+│
+└── deployment/
+    └── app.py
+
+Yana boshqa tuzilish:
+evaluation/evaluate.py 
+evaluation/perplexity.py 
+evaluation/generate.py 
+evaluation/results.json  
+
+
+UI — User Interface, ya’ni foydalanuvchi interfeysi. Bu foydalanuvchi LLM bilan muloqot qilishi uchun yaratiladigan veb-sahifa yoki dastur oynasidir.
+ui/index.html — foydalanuvchi LLM bilan muloqot qiladigan veb-sahifani yaratadigan asosiy HTML fayl.
+Uning vazifalari:
+Chat oynasini yaratadi — foydalanuvchi savollari va model javoblarini ko‘rsatadi.
+Input maydonini yaratadi — foydalanuvchi savolini kiritadi.
+Send tugmasini yaratadi — savolni serverga yuboradi.
+FastAPIga ulanadi — JavaScript fetch() yordamida /generate endpointiga so‘rov yuboradi.
+Javobni ko‘rsatadi — serverdan kelgan JSON javobini chat oynasida chiqaradi.
+Interfeys dizaynini belgilaydi — HTML, CSS va JavaScript yordamida sahifaning ko‘rinishi va ishlashini boshqaradi.
+
+Deployed Artifacts nima?
+Deployed Artifacts — LLM o‘qitib bo‘lingandan keyin, uni serverda ishga tushirish uchun kerak bo‘ladigan saqlangan fayllar va resurslar.
+checkpoints/model.pt — O‘qitilgan LLM modeli
+Modelning training davomida o‘rgangan parametrlari (weights) saqlanadigan PyTorch fayli.
+Modelni har safar qaytadan o‘qitmasdan, undan javob generatsiya qilishda foydalaniladi.
+Asosiy vazifasi: O‘qitilgan modelni saqlash va keyinchalik serverda ishga tushirish imkonini berish.
+
+
+
+Frontend (Vercel)
+ va Backend (Railway) nima?
+
+Biz yaratgan LLMni internetga joylashtirish uchun ikkita platforma
+
+Vercel — Frontendni, ya’ni foydalanuvchi ko‘radigan veb-saytni internetga joylashtiradi.
+Railway — Backendni, ya’ni foydalanuvchi so‘rovlarini qayta ishlaydigan server dasturini internetga joylashtiradi.
+
+Vercel
+Frontend va veb-ilovalarni joylashtirish platformasi.
+Frontend — foydalanuvchi ko‘radigan va foydalanadigan interfeys.
+Masalan, bizning LLM loyihamizda:
+Savol yoziladigan chat oynasi.
+Savolni yuborish tugmasi.
+LLM javoblari ko‘rsatiladigan joy.
+Veb-sayt dizayni
+Kabilar bor
+Bular ui/index.html orqali yaratilishi mumkin. Vercel esa shu interfeysni internetga joylashtiradi, shunda foydalanuvchilar brauzer orqali foydalanishadi.
+
+
+Railway
+Server dasturlari va APIlarni joylashtirish platformasi.
+Backend — foydalanuvchiga bevosita ko‘rinmaydigan, serverda ishlaydigan dasturiy qism.
+LLM loyihasida Backend:
+FastAPI serverni ishga tushiradi.
+Foydalanuvchining savolini qabul qiladi.
+Model va tokenizer bilan ishlaydi.
+Inference jarayonini bajaradi.
+Tayyor javobni Frontendga yuboradi.
+Bizning loyihamizda deployment/app.py Backendning API qismini boshqaradi.
+Railway shu Backend dasturini serverda ishga tushirish va internet orqali foydalanish uchun joylashtirishga xizmat qiladi. Katta LLMni ishlatish uchun mos xotira va GPU resurslari alohida talab qilinishi mumkin.
+
+Vercel va Railway qanday bog‘lanadi?
+Foydalanuvchi
+"Amir Temur kim?"
+Frontend — Vercel
+ui/index.html — savolni yuboradi
+HTTP API orqali aloqa
+Backend — Railway
+deployment/app.py — so‘rovni qabul qiladi
+LLM — Inference Engine
+Model javob generatsiya qiladi
+Javob Backend orqali Frontendga qaytariladi
