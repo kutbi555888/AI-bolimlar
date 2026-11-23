@@ -1,0 +1,70 @@
+1 dars savollar
+
+Qoshimcha savollar
+1.Post-training nima ekanini bir jumlada .
+Post training bu model keyingi sozni predict qilishni organgandan keyin endi modelni userga foydali va korsatmalariga amal qilib javob beradigan qilishga orgatishdir. 
+2.Pre-training va post-training farqini uchta o‘lchov bo‘yicha .
+Data hajmi, turi
+Parametrlarning qanchasi yangilanishi
+Loss ning faqat javobga hisoblanishi 
+3.Base model nega javob bera olmasligini tushuntiring
+Chunki base model hali faqat keyingi soznigina predict qilishga organgan boladi 
+4.SFT, RLHF va DPO qaysi ma'lumot turini talab qiladi?
+Sft savol javob
+Rlhf da inson Adan B javob afzal deb aytadi
+DPOda modelga mana bu eng yashi javob mana bu yaxshi bolmagan javob deb beriladi 
+5.LoRA — SFT ga alternativa EMASligini tushuntira olasizmi?
+SFT bu o‘qitish usuli,metodi, LoRA esa parametrlarni  yangilash texnikasidir
+6.Qaysi metod Colab T4 da ishlashini va nega ishlamasligini bilasizmi?
+Full Fine Tuning(SFT) - 1mlrdan kichik modellar bolsa
+Lora - 7mlrdgacha modellar
+QLora - 13mlrdgacha modellar
+DPO - Lora bilan mumkin
+RLHF + PPO - xotira yetmaydi chunki Policy, reward, value va generationlar sabab 
+7.Colab’da base modelni yuklab, undan javob ola olasizmi?
+Ha Google Colabda tayyor Base LLMni Hugging Facedan yuklab, uni umuman o‘qitmasdan ham javob yoki matn yaratishini sinab ko‘rish mumkin. Bu jarayon Inference deyiladi.
+Bunda bizga SFT, LoRA, DPO yoki boshqa post-training metodlari shart emas.
+
+Interview savollari Easy
+1. Post-training nima? 
+Bir jumlada tushuntiring.
+Post training bu model keyingi sozni predict qilishni organgandan keyin endi modelni userga foydali va korsatmalariga amal qilib javob beradigan qilishga orgatishdir. 
+2. Pre-training va post-training o‘rtasidagi asosiy farq nima?
+Pre-training va post-training o‘rtasidagi asosiy farq bu modelni javob berishi. Pre-training da model faqat keyingi sozni predict qilishni organadi. Post-trainingda esa model user korsatmalariga mos javob berishni organadi
+ 3. SFT nimaning qisqartmasi va qanday ma'lumot talab qiladi?
+Supervised Fine-Tuning 
+Savol javob shaklidagi malumotni
+ 4. Base model va instruct model o‘rtasidagi farq nima? 
+Base model Pre-train qilinib faqat keyingi sozni predict qilishni organgan boladi
+Instruct model esa Post-training qilinib user korsatmalariga mos javob berishni organgan boladi
+
+Interview savollari Medium 
+5. Nega SFTda loss faqat javob (response) tokenlariga hisoblanadi?
+Birinchisi model savol berishni emas javob berishni organishi kerakligi uchun loss javob tokenlariga hisoblanadi
+Ikkinchisi qaysidir miqdorda overfittingni ham oldini olishi mumkin
+ 6. LoRA — SFT ga alternativami? Javobingizni izohlang.
+LoRA — SFT ga alternativa emas chunki
+SFT bu o‘qitish usuli,metodi, LoRA esa parametrlarni  yangilash texnikasidir
+ 7. DPO RLHF’dan qaysi komponentni olib tashlaydi va nega bu muhim?
+DPO RLHFdan 2ta asosiy komponentga bo‘lgan ehtiyojni olib tashlaydi:
+Reward Model (RM) — javoblarning sifatini baholashni o‘rganadigan alohida mukofot modeli.
+PPO (Proximal Policy Optimization) — mukofotni oshirish uchun LLMni Reinforcement Learning orqali o‘qitadigan algoritm.
+Bu juda muhim, chunki DPO inson afzal ko‘rgan javoblarni alohida Reward Model o‘qitmasdan va PPO algoritmini ishlatmasdan bevosita o‘rganadi.
+
+Interview savollari — Hard 
+8. 16GB VRAM va 2000 ta instruction juftlik bor. 7B modelni qanday post-train qilasiz va nega?
+Men 7B modelni 4-bit QLoRA yordamida SFT (Supervised Fine-Tuning) qilaman.
+Chunki bizda ikkita muhim cheklov bor:
+GPU xotirasi — 16 GB VRAM. Bu 7 milliard parametrli modelni oddiy Full Fine-Tuning qilish uchun yetarli emas.
+Yani QLoRA orqali modelni 4-bit NF4 formatda yuklab, asosiy parametrlarni muzlataman va faqat LoRA adapterlarini o‘qitaman.
+Dataset — 2000 ta instruction-response juftlik. Bu SFT uchun ishlatilishi mumkin, lekin katta dataset emas. Shuning uchun overfitting xavfini nazorat qilish kerak.
+SFT + LoRA (FP16) esa  Model vaznlarining o‘zi taxminan 14 GB egallaydi  
+9. Post-trainingdan keyin model yangi vazifada yaxshi, eski vazifada yomonlashdi. Bu nima deb ataladi va qanday aniqlaysiz?
+Bu hodisa Catastrophic Forgetting (katastrofik unutish) deb ataladi.
+Yani modelning yangi vazifani o‘rganish jarayonida ilgari o‘rgangan bilimlari yoki qobiliyatlarini yo‘qotishi deyiladi. 
+Asosiy sabab — model yangi vazifani o‘rganayotganda avvalgi vazifalar uchun muhim bo‘lgan parametrlar yoki xatti-harakatlarini o‘zgartirib yuboradi. Buni aniqlash masalan model kimyo va  matematika bilan oqitilgan va ikkalasidan ham yaxshi javob berayapti. Endi qoshimcha yana Fizika bilan oqitdik. Endi model Fizikadan yaxshi javob berayapti lekin oldingi matematika bilan kimyodan yaxshi javob bermay qoydi. Ana shu holatda model catastrophic forgetting bolgan bolishi mumkin. Lekin boshqa sabablari ham bolishi mumkin. Masalan negative transfer (bir vazifaga moslashish boshqasiga zarar yetkazishi) yoki baholashdagi o‘zgarishlar ham sabab bo‘lishi mumkin.
+ 10. Kompaniya modeldan doim JSON formatda javob so‘raydi. SFT, DPO yoki prompt engineering — qaysi birini tanlaysiz va nega?
+2ta yolni qilish mumkin 
+Birinchisi Promt engineering qilib Modelga JSON formatida javob berish ko‘rsatmasini beramiz. Bu eng yaxshi variant.
+Ikkinchisi agar model JSON ko‘rsatmalariga muntazam amal qilmasa, misollar bilan o‘qitamiz yani SFT qilamiz
+Dpo esa asosan afzal va kamroq afzal javoblarni taqqoslab o‘qitish uchun ishlatiladi. Bu variant unchalik mos emas.
