@@ -1,0 +1,167 @@
+3 dars savollar
+
+1.EOS nima?
+EOS bu End of Sequence ketma ketlikning tugashi. Maxsus token. Generate qilishni toxtatadi
+EOT esa End of turn navbatning tugashi. Vazifasi keyingi rolga navbat berib kutib turish.misol uchun user gapirdi EOT assistant gapirdi EOT keyin yana user EOT. Shunaqa davom etadi
+
+2.Pretraining va Post training ni qanday farqi bor?
+Pre-training va post-training o‘rtasidagi asosiy farq bu modelni javob berishi. Pre-training da model faqat keyingi sozni predict qilishni organadi. Post-trainingda esa model user korsatmalariga mos javob berishni organadi
+
+3.Pretraining va Post trainingni 1 tadan oson va qiyinchilik tomonlarini sanang
+Pre trainingni oson tomoni Self-Supervised Learning usulida o‘qitish mumkin. Har bir savolga alohida javob yozib, label qo‘yish shart emas.
+Qiyin tomoni Juda katta hisoblash resurslari talab qilinadi. Katta LLMni noldan o‘qitish uchun ko‘p miqdorda sifatli ma’lumot, kuchli GPUlar, katta VRAM va uzoq training jarayoni kerak.
+Post-trainingni oson tomoni Tayyor modeldan foydalaniladi. Modelni noldan o‘qitish shart emas. SFT, LoRA yoki QLoRA yordamida uni muayyan vazifaga kamroq resurs bilan moslashtirish mumkin.
+Qiyin tomoni:
+Catastrophic Forgetting xavfi mavjud. Model yangi vazifani o‘rganayotganda oldingi bilimlari yoki qobiliyatlarining bir qismini yo‘qotishi mumkin.
+ 
+4.Base vs Instruct model
+Pre training bolgan. Base model juda kop bilimga ega lekin bilimini qanday ishlatishni bilmaydi hali. faqat keying sozni predict qila oladi xolos
+Post training bolgan. Instruct model Post training bolgan model bolib user bergan korsatmalarga amal qiladi, togri javob beradi , xavfli sorov berilsa bosh tortadi. yani 3ta HHH ga erishilgan boladi. Honest(togri gapiradi) , Helpful(yordam beradi, yordamchi boladi), Harmless(zararli sorovlardan bosh tortadi)
+
+5.DPO nima?
+DPO (Direct Preference Optimization, afzalliklarni to‘g‘ridan-to‘g‘ri optimallashtirish.). DPOda afzal javob va kamroq afzal javob beriladi. DPO modeli afzal javobni kam Afzal  javobga nisbatan ko‘proq afzal ko‘rishni o‘rganadi. Bunda alohida Reward Model va PPO kerak emas.
+
+6.RLHF nima?
+RLHF (Reinforcement Learning from Human Feedback). LLMni insonlarning fikri va baholari asosida yaxshiroq javob berishga o‘rgatish usuli. Oddiy qilib aytadigan bolsak inson qaysi javob yaxshiroq ekanini ko‘rsatadi, model esa shu afzalliklardan foydalanib yaxshiroq javob berishni o‘rganadi. keyin Reward Model shu inson tanlovlarini baholashni o‘rganadi, keyin PPO LLMni yuqoriroq mukofot oladigan javoblarni yaratishga moslashtiradi.
+Reward Model — inson tanlovlari asosida javoblarga mukofot bahosi berishni o'rganadi.
+PPO — Reward Model bergan mukofot asosida LLM parametrlarini yangilaydi.
+
+7.SFT nima?
+Supervised Fine Tuning. SFTda model umuman 1chi javob berishni organadi. inson bergan savol javob namunalarini organib shu namunalarga taqlid qilib javob berishga harakat qiladi.
+
+8.LORA nima?
+Low Rank Adaptation. parametrlarni yangilovchi vosita. Loraning afzallik tomoni Lora hamma parametrlarni yangilamaydi balki kerakli bolgan qismini eritib yangilaydi va qolgan hamma parametrlarni muzlatadi. 0,1 yoki 1% qismini eritib shu qism parametrlarni yangilab qolganini muzlatadi
+
+9.SFT vs LORA?
+SFT va LoRA bir-biriga alternativ emas. Chunki SFT modelni o‘qitish usuli, LoRA esa model parametrlarini samarali yangilash vositasi,texnikasi.
+SFT bu oldindan o‘qitilgan LLMni tayyor instruction-response juftliklari yordamida qo‘shimcha o‘qitish. Lora esa shu oqitish davomida parametrlarni yangilab boradi. yani modelni tushunchasiga , bilimiga ozgina yangilanish kiritadi.
+
+10.RLHF vs DPO?
+ikkalasi ham LLMni inson afzalliklariga moslashtirish uchun ishlatiladigan post-training yondashuvlari. ikkalasining ham asosiy maqsadi bir xil: modelga qaysi javob yaxshiroq ekanini o‘rgatish. Lekin ularning ishlash usuli farq qiladi:
+Klassik RLHF — avval Reward Model o‘qitiladi, so‘ng PPO kabi Reinforcement Learning algoritmi orqali LLMni yuqoriroq mukofot olishga o‘rgatiladi.
+DPO — alohida Reward Model va PPOsiz yaxshi va yomonroq javoblarni bevosita taqqoslash orqali LLMni o‘qitadi.
+
+11.Full SFT vs LORA?
+Full Fine-Tuning va LoRA ikkalasi ham modelni Fine-Tuning qilishda parametrlarni yangilash yondashuvlaridir. Full Fine-Tuning modelning barcha asosiy parametrlarini yangilaydi. LoRA esa asosiy parametrlarni muzlatib, kichik qo‘shimcha adapterlarni o‘qitadi. Har ikkala yondashuv SFTda ishlatilishi mumkin.
+
+
+
+Savollar
+
+1.Base Model malumotlarni biladi lekin nima uchun yaxshi javob bermaydi?
+Togri base modelni ilmi juda kop boladi lekin hali shu ilmlardan togri foydalanishni bilmaydi. Faqat keyingi sozni predict qilish qobiliyatigagina ega boladi, hali toxtashni ham bilmaydi.Base Model pre-training jarayonida ma’lumotlar va til qonuniyatlarini o‘rganadi, lekin hali foydalanuvchining ko‘rsatmalariga amal qilib, foydali, aniq va tartibli javob berishga o‘rgatilmagan bo‘ladi. Yani hali Post-training qilinmagan boladi
+ 2.LORA ni SFT ni o’rniga ishlatsak boladimi?
+Yo‘q, LoRA SFTning o‘rnini bosmaydi.
+SFT  modelni instruction-response dataset orqali o‘qitish usuli.
+LoRA modelning asosiy parametrlarini muzlatib, kichik qo‘shimcha adapterlarni yangilash texnikasi.
+SFTni Full Fine-Tuning yoki LoRA yordamida bajarish mumkin.
+LoRA SFTdan tashqari DPO va boshqa post-training usullarida ham ishlatiladi. 
+3.SFT va LORA ni birdaniga ishlatsak boladimi?
+Ha albatta boladi. Sft va Lora bular bitta training jarayonidir. SFT modelni instruction-response dataset orqali o‘qitadi. LoRA esa asosiy model parametrlarini muzlatib, kichik qo‘shimcha adapterlarni yangilaydi.
+ 4.Post training Pipeline qanday?
+Base Model(Pre-trainingdan o‘tgan LLM)
+Dataset Preparation(SFT va preference ma’lumotlarini tayyorlash)
+SFT(Instruction-response misollari bilan o‘qitish)
+Preference Optimization(DPO yoki klassik RLHF (ixtiyoriy))
+Safety & Alignment(Xavfsizlik va kerakli xatti-harakatlarni tekshirish)
+Evaluation(Javob sifati, benchmark va forgettingni baholash)
+Deployment(Modelni API yoki ilovada ishga tushirish)
+
+Savollar
+1.Knowledge problem va behavior problem?
+Knowledge Problem (bilim muammosi) — modelda kerakli ma’lumot yo‘q, u yetarli o‘rganilmagan yoki model undan to‘g‘ri foydalana olmasligi.
+Behavior Problem (xatti-harakat muammosi) — modelda kerakli bilim bo‘lishi mumkin, lekin u foydalanuvchi ko‘rsatmasiga mos javob bermasligi.
+Knowledge Problem model nimani biladi?Behavior Problem  model qanday javob beradi? 
+2.Limited GPU budget: Full FT, LoRA, or QLoRA?
+Qaysi vaziyatda qaysi metod yaxshi?
+Full FT — kichik model va yetarli GPU bo‘lsa, ayniqsa barcha parametrlarni yangilash zarur bo‘lganda tanlayman.
+LoRA — asosiy model GPUga bemalol sig‘sa, lekin barcha parametrlarni o‘qitish uchun xotira yetmasa, tanlayman.
+QLoRA — katta modelning hatto FP16 vaznlari ham GPU xotirasining katta qismini egallasa, tanlayman.
+QLoRA har doim eng tez yoki eng sifatli metod degani emas. Kvantlash kichik aniqlik yo‘qotishlariga sabab bo‘lishi, vaznlarni hisoblash formatiga ochish esa qo‘shimcha xarajat keltirishi mumkin. Shuning uchun GPU yetarli bo‘lgan holatda LoRA yoki Full FT ham maqsadga muvofiq bo‘ladi. 
+3.Qanday qilib Post Trainingni baxolaymiz?
+Post-training Evaluation Pipeline:
+Base / SFT Model(Post-trainingdan oldingi model)
+Baseline Evaluation(Modelning boshlang‘ich natijalarini o‘lchaymiz)
+Post-training(SFT yoki DPO / RLHF)
+Evaluation(Loss, Accuracy, Instruction Following, Human Evaluation qilinadi)
+Regression & Safety Testing(Eski qobiliyatlar va xavfsizlik tekshiriladi)
+Best Checkpoint Selection(Eng yaxshi modelni tanlaymiz) 
+4.Behaviour Cloning va Teacher Forcing ni qanday farqi bor?
+Ularning asosiy farqi:
+Behaviour Cloning (BC) — modelni tayyor namunaviy javoblar orqali inson yoki boshqa ekspertning xatti-harakatiga taqlid qilishga o‘rgatish.
+Teacher Forcing (TF) esa — training vaqtida keyingi tokenni bashorat qilish uchun modelning oldingi bashorati o‘rniga haqiqiy oldingi tokenni berish texnikasi. 
+5.Loss Masking va Cross Entropy Loss larni SFT dagi o’rni?
+Loss Masking va Cross-Entropy Loss SFT jarayonida birgalikda ishlatiladi, lekin ularning vazifalari har xil.
+Loss Masking — qaysi tokenlar uchun xatolik hisoblanishi yoki hisoblanmasligini belgilaydi.
+Cross-Entropy Loss esa — tanlangan tokenlar uchun modelning bashorati qanchalik xato ekanini hisoblaydi.
+Loss Masking — qayerda lossni hisoblaymiz?
+Cross-Entropy Loss esa — model qancha xato qildi?
+6.SFT next word prediction dan foydalanadimi? Tokenizationdanchi?
+Ha, SFT ham Next Token Prediction ham Tokenizationdan foydalanadi. Chunki SFTda odatda modelning asosiy arxitekturasi va tokenlarni bashorat qilish mexanizmi o‘zgarmaydi.
+Pre-training va SFT o‘rtasidagi asosiy farq — model qanday ma’lumotda o‘qitilishi va qaysi tokenlar uchun Loss hisoblanishida.Pre-training va SFT o‘rtasidagi muhim farqlardan biri:
+Pre-trainingda odatda matndagi barcha mos keyingi tokenlar uchun Loss hisoblanadi.
+Completion-only SFTda esa odatda faqat assistant javobidagi tokenlar uchun Loss hisoblanadi. SFTda odatda pre-trainingda ishlatilgan tokenizerning o‘zi saqlanadi. Modelning lug‘atini (vocabularyni) yangidan yaratish shart emas. Ha, SFTda ham model keyingi tokenni bashorat qilish orqali o‘rganadi. 
+Next Token Prediction  model oldingi tokenlar asosida keyingi tokenni bashorat qiladi. Tokenizationda instruction va response matnlarini tokenlarga ajratib, ularni token IDlarga aylantiradi.SFTda model yangi bashorat qilishni o‘rganmaydi. U pre-trainingda ishlatgan Next Token Prediction mexanizmidan foydalanib, foydalanuvchi ko‘rsatmalariga mos javoblarni yaratishga yaxshiroq moslashadi.SFTda modelni kerakli javob xatti-harakatiga yo‘naltiradigan ma’lumotlar ishlatiladi.
+
+Savollar
+1. SFT architeturasini gapirib bering?
+SFTning to‘liq arxitekturasi:
+1. SFT Dataset
+(Instruction + Response juftliklari)
+2. Chat Template
+(System, User, Assistant xabarlarini formatlash)
+3.Tokenization
+Matn → Tokenlarga bolish → Token ID berish
+4. Transformer Model
+(Embedding → Transformer Blocks → LM Head)
+5. Next Token Prediction
+(Keyingi tokenlar uchun Logits va ehtimollar)
+6. Loss Masking + Cross-Entropy
+(Kerakli tokenlarning bashorat xatoligini hisoblash)
+7. Backpropagation
+(Gradientlarni hisoblash)
+8. Optimizer Step
+(Modelning o‘qitiladigan parametrlarini yangilash)
+
+2. SFT data formatlari xaqida gapiring?
+SFT Data Formatlari:
+Alpaca
+(Instruction / Input / Output)
+ShareGPT
+(Conversations / From / Value)
+Messages
+(Role / Content) 
+Prompt-Completion
+(Prompt / Completion)
+Text
+(Bitta matn maydoni)
+Conversational
+(Suhbat tarixi + javob)
+
+3.Cross entropy Loss SFT da qanday xisoblanadi?
+SFTda loss turlaridan Cross Entropy loss ishlatiladi. Formulasi L=-log(p)
+Umumiy loss hisoblanadi: 10+20+30=60
+Ortacha loss olinadi:
+60:3=20
+Bu ortacha xatolik qiymati loss o‘zgaruvchisiga yoziladi. Keyin aynan shu loss orqali Backpropagation bajarilib, model parametrlari yangilanadi.
+
+4. Medical chatbot SFT pipeline?
+Medical Chatbot SFT — to‘liq Pipeline:
+1. Scope & Requirements
+(Chatbotning vazifasi va cheklovlarini aniqlash. Va chatbot haqida malumot. Qanday chatbot qilmoqchimiz shu haqida batafsil malumot)
+2. Medical Data Collection
+(Ishonchli tibbiy ma’lumotlarni yig‘ish)
+3. Privacy & Data Cleaning
+(Maxfiy ma’lumotlarni himoyalash va tozalash)
+4. Medical SFT Dataset
+(Instruction → Clinically Reviewed Response)
+5. Base Model Selection
+(Mos pre-trained modelni tanlash)
+6. Chat Template & Tokenization
+(Model ajratishi uchun chat format tanlash va Datasetni tokenlarga aylantirish)
+7. SFT + LoRA / QLoRA
+(Modelni kam resurs bilan samarali oqitish)
+8. Clinical & Safety Evaluation
+(Aniqlikni, xavfsizlikni va javob sifatini baholash)
+
+Fine-tuning — oldindan pre-trained bolgan modelni yangi ma'lumot yoki vazifa bo‘yicha qo‘shimcha training qilish. Yani train bolgan modelni ozimizni maqsadimizga moslashtirish uchun qoshimcha malumotlar bilan oqitish. LLMda oldindan o‘qitilgan LLMni yangi vazifaga moslashtirish Fine tuningdir.​
