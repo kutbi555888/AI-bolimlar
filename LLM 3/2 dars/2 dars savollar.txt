@@ -1,0 +1,90 @@
+2 dars savollar
+
+Interview savollari — Easy 
+1. SFT nimaning qisqartmasi va qanday ma’lumot talab qiladi?
+SFT Supervised Fine-Tuning 
+Savol javob shaklidagi juftliklar 
+2. Chat template nima va u nega kerak? 
+Chat template bu chat shablon. Chat template nega kerak. Bu koproq model uchun kerak chunki model savol javob bolganda rollarni ajratishi kerak.kim savol beryapti kim javob beradi kabi. Agar rollar bolmasa model kim savol beryapti , kim javob beryapti bularni bilmaydi hammasini aralashtirib yuboradi.
+3. SFTda qanday loss funksiyasi ishlatiladi?
+Cross Entropy loss.  Loss faqat javobga hisoblanadi  
+4. Alpaca va ShareGPT formatlarining farqi nima?
+Alpaca — asosan bitta topshiriq (instruction) va unga tegishli javobni saqlash uchun ishlatiladi.
+ShareGPT — foydalanuvchi va assistant o‘rtasidagi bir yoki bir nechta xabardan iborat suhbatni saqlash uchun ishlatiladi.
+Ya’ni Alpaca — topshiriq-javob formati, ShareGPT esa suhbat formati.
+Alpaca formatida odatda uchta maydon bo‘ladi:
+instruction — model bajarishi kerak bo‘lgan topshiriq.
+input — topshiriqni bajarish uchun qo‘shimcha ma’lumot.
+output — model yaratishi kerak bo‘lgan javob.
+{
+  "instruction": "Tarjima qil",
+  "input": "Hello",
+  "output": "Salom"
+}
+
+
+ShareGPT suhbatdagi xabarlarni ketma-ket saqlaydi.
+Asosiy maydonlari:
+conversations — suhbatdagi xabarlar ro‘yxati.
+from — xabarni kim yozganini bildiradi.
+value — xabarning matni.
+Odatda from maydonida:
+human — foydalanuvchi.
+gpt — assistant.
+system — modelga beriladigan umumiy ko‘rsatmalar.
+
+{
+  "conversations": [
+    {
+      "from": "human",
+      "value": "Python nima?"
+    },
+    {
+      "from": "gpt",
+      "value": "Python — dasturlash tili."
+    },
+    {
+      "from": "human",
+      "value": "U qayerda ishlatiladi?"
+    },
+    {
+      "from": "gpt",
+      "value": "Python AI, Machine Learning va veb dasturlashda ishlatiladi."
+    }
+  ]
+}
+Bu misolda ShareGPT ikkita savol-javob almashinuvini bitta suhbat sifatida saqlamoqda.
+Model suhbat tarixidan foydalanib, keyingi javobni yaratishni o‘rganishi mumkin.
+
+Interview savollari — Medium 
+5. Nega labelsda  -100 ishlatiladi va u qaysi tokenlarga qo‘yiladi?
+- 100 degani bu shu tokenga loss hisoblanmasin degani. Loss maskingda odatda - 100 tokenni mask qilish
+6. SFTdan keyin ham model to‘xtamayapti. Uchta mumkin sababini ayting.
+EOS/EOT token muammosi — SFT datasetda javobni tugatish tokeni yo‘q yoki noto‘g‘ri ishlatilgan. Natijada model qachon to‘xtashni o‘rganmagan bo‘lishi mumkin.
+Chat Template muammosi — Training va inference vaqtida turli formatlar ishlatilgan. Natijada model javob chegaralarini noto‘g‘ri aniqlashi mumkin.
+Stopping Criteria muammosi — Inference vaqtida eos_token_id yoki EOT tokeni noto‘g‘ri sozlangan. Natijada model max_new_tokens chegarasigacha generatsiyani davom ettiradi.
+7. SFTda learning rate nega pre-trainingdagidan ancha past?
+Pre-trainingda model katta dataset orqali til qonuniyatlari va umumiy bilimlarni o‘rganadi. SFTda esa model allaqachon o‘qitilgan bo‘ladi va uni faqat ma’lum vazifalarga moslashtirish kerak.
+Shuning uchun Full SFTda odatda pastroq Learning Rate ishlatiladi. Bu model parametrlarining haddan tashqari o‘zgarishini cheklashga, oldingi bilimlarni saqlashga va training barqarorligini yaxshilashga yordam beradi.Agar Learning Rate juda yuqori bo‘lsa, catastrophic forgetting, overfitting yoki training instability( loss kuchli tebranishi yoki hatto oshib ketishi mumkin) yuzaga kelishi mumkin.
+Past Learning Rate: mavjud parametrlarni ehtiyotkorlik bilan yangilashga yordam beradi.
+Lekin LoRA va QLoRAda Learning Rate Full SFTdan yuqoriroq bo‘lishi mumkin, chunki asosiy model vaznlari muzlatilgan va faqat adapterlar o‘qitiladi.
+
+
+Interview savollari — Hard 
+8. 0.5B modelni T4da full SFT qilish uchun xotirani hisoblang. 7B uchun nima o‘zgaradi?
+FP16 mixed precision va odatiy AdamW konfiguratsiyasida parametr boshiga taxminan 18 bayt hisoblayman.
+0.5B model uchun:
+Weights — 3 GB.
+Gradients — 2 GB.
+Optimizer States — 4 GB.
+Jami 9 GB + activations va boshqa xotira sarflari kerak. Shuning uchun 0.5B modelni 16 GB T4da kichik batch va gradient checkpointing bilan Full SFT qilish mumkin.
+7B model uchun esa xuddi shu hisobda 126 GB + activations talab qilinadi. Bu 16 GB T4ga sig‘maydi.
+Shuning uchun 7B modelda Full SFT o‘rniga 4-bit QLoRA tanlayman. U asosiy model vaznlarini kvantlaydi, muzlatadi va faqat kichik LoRA adapterlarini o‘qitadi. Natijada GPU xotirasi ancha tejaladi.0.5B model Full SFT uchun T4ga sig‘ishi mumkin. 7B modelda esa parametr va optimizer xotirasi juda katta bo‘lgani uchun odatda QLoRA kabi PEFT texnikasiga o‘tish kerak. 
+9. Kompaniya modelga yangi mahsulot ma’lumotlarini SFT orqali o‘rgatmoqchi. Qanday xavf bor va nimani tavsiya qilasiz?
+Yangi mahsulot ma’lumotlarini SFT orqali o‘rgatishning asosiy xavflari — outdated information, hallucination va catastrophic forgetting.
+SFT model parametrlarini yangilaydi, lekin mahsulot narxi yoki xususiyatlari o‘zgarganda model avtomatik yangilanmaydi. Shuningdek, yangi ma’lumotlar bilan o‘qitish eski qobiliyatlarning yomonlashishiga olib kelishi mumkin.
+Shuning uchun men birinchi navbatda RAGni tavsiya qilaman. RAG modelga kompaniyaning yangilanadigan ma’lumotlar bazasidan kerakli mahsulot ma’lumotlarini topib, ularga asoslanib javob berish imkonini beradi.Agar model kompaniyaning maxsus javob formati yoki uslubiga moslashishi kerak bo‘lsa, RAG bilan birga SFT ham qo‘llash mumkin.Ya’ni yangi bilimlar uchun RAG, modelning xatti-harakati va javob uslubini o‘zgartirish uchun SFT tanlayman. 
+10. Train loss tushmoqda, eval loss ko‘tarilmoqda, lekin javoblar yaxshilanmoqda. Nima bo‘lyapti va qaysi checkpointni tanlaysiz?
+Bu holatda overfitting (ortiqcha moslashish) boshlanayotgan bo‘lishi mumkin, lekin Eval Loss oshgani modelning haqiqiy javob sifati yomonlashganini har doim ham anglatmaydi.
+Asosiy sabab — Cross-Entropy Loss va javob sifati bir xil narsani o‘lchamaydi.
+Shuning uchun men checkpointni faqat eng past Eval Lossga qarab emas, balki mustaqil validation datasetdagi javob sifati va vazifaga mos metrikalar asosida tanlayman.
