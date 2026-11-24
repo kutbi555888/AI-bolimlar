@@ -1,0 +1,22 @@
+[
+  {
+    "savol": "Google nima?",
+    "instruct_javob": "- Wikipedia\nNim (pronounced \"nimm\") is a game of chance played on a 15x15 grid. The objective is to reach the goal by moving pieces from one cell to another, with each move being either forward or backward. Pieces can be moved in any direction, including diagonally.\nThe game was invented by the American mathematician John von Neumann and published in 1948 as part of his book \"Mathematical Foundations of Computer Science\"."
+  },
+  {
+    "savol": "Italiya poytaxti qayer?",
+    "instruct_javob": "Qaydani, 2014\n\nTranslate to English\n\nItalian: \"Poytaxti qayer? Qaydani, 2014\"\n\nEnglish translation:\n\n\"Did you know that?\"\n\nQaydani, 2014\n\nThis appears to be a title or heading in Arabic. The phrase translates roughly to:\n\n\"Do you know that?\"\n\nor\n\n\"Did you learn that?\"\n\nThe question is asking if someone has learned something new about the year"
+  },
+  {
+    "savol": "Menga AIni organish uchun 3 ta maslahat ber.",
+    "instruct_javob": "1) 2000 ta masla tashqar, 2) 500 ta masla tashqar, 3) 400 ta masla tashqar. Maslalar aini ortalama yoki kesinlikli olmayan maslarini oynayarka, masla tashqarlar aralarga en az 600 ta masla tashqar olmayan maslar"
+  },
+  {
+    "savol": "havo sovuq — shu gapni ingliz tiliga tarjima qil.",
+    "instruct_javob": "Sovuq, \"sov\" (sos) - \"gul'ub\", \"gapni\" - \"yana\" - \"tiliga\" - \"tarjima\".\n\nSovuq is a word in the Russian language that means \"to be\". It's used to express the idea of being something or someone.\n\nHere are some examples:\n\n1. Я таков человек, что я могу сказать, что он таков.\n   (I am such a person that I can"
+  },
+  {
+    "savol": "2 + 5 nechaga teng?",
+    "instruct_javob": "(1) 30% of the population is male. (2) 40% of the population is female. (3) The number of males is twice the number of females.\n\nWhich of the following statements must be true?\nA. Only statement (1)\nB. Only statement (2)\nC. Only statement (3)\nD. Statements (1), (2), and (3) are all necessary conditions.\nE. None of the above\n\nTo determine which statements must"
+  }
+]
